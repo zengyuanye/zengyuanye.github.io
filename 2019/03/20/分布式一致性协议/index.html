@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="架构,分布式,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="分布式一致性协议分布式一致性协议有很多种比如：paxos,Raft,2PC,3PC,ZAB 在分布式系统中有CAP理论，阐述了在一个分布式系统中不可能同时满足一致性（Consistency）、可用性(Availability)、以及分区容错性（Partition tolerance）">
+<meta name="keywords" content="架构,分布式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式一致性协议">
+<meta property="og:url" content="http://yoursite.com/2019/03/20/分布式一致性协议/index.html">
+<meta property="og:site_name" content="zengyuanye">
+<meta property="og:description" content="分布式一致性协议分布式一致性协议有很多种比如：paxos,Raft,2PC,3PC,ZAB 在分布式系统中有CAP理论，阐述了在一个分布式系统中不可能同时满足一致性（Consistency）、可用性(Availability)、以及分区容错性（Partition tolerance）">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-03-28T10:13:08.753Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分布式一致性协议">
+<meta name="twitter:description" content="分布式一致性协议分布式一致性协议有很多种比如：paxos,Raft,2PC,3PC,ZAB 在分布式系统中有CAP理论，阐述了在一个分布式系统中不可能同时满足一致性（Consistency）、可用性(Availability)、以及分区容错性（Partition tolerance）">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/20/分布式一致性协议/">
+
+
+
+
+
+  <title>分布式一致性协议 | zengyuanye</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zengyuanye</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/20/分布式一致性协议/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zengyuanye">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zengyuanye">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">分布式一致性协议</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-20T18:00:21+08:00">
+                2019-03-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/架构/" itemprop="url" rel="index">
+                    <span itemprop="name">架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="分布式一致性协议"><a href="#分布式一致性协议" class="headerlink" title="分布式一致性协议"></a>分布式一致性协议</h3><p>分布式一致性协议有很多种比如：paxos,Raft,2PC,3PC,ZAB</p>
+<p>在分布式系统中有CAP理论，阐述了在一个分布式系统中不可能同时满足一致性（Consistency）、可用性(Availability)、以及分区容错性（Partition tolerance）</p>
+<a id="more"></a>
+<ul>
+<li>C:一致性</li>
+</ul>
+<p>在分布式系统中数据往往存在多个副本，一致性描述的是这些副本中的数据在内容和组织上的一致。</p>
+<ul>
+<li>A:可用性</li>
+</ul>
+<p>可用性描述了系统对用户的服务能力，所谓可用是指在用户容忍的时间范围内返回用户期望的结果</p>
+<ul>
+<li>P:分区容错性</li>
+</ul>
+<p>分布式系统通常由多个节点组成，由于网络是不可靠的，所以存在分布式集群中的节点因为网络通信故障导致被孤立成一个个小集群的可能性，即网络分区，分区容错性要求在出现网络分区时系统仍能对外提供一致性的可用服务。</p>
+<h3 id="两阶段提交协议（2PC：TWO-Phrase-Commit"><a href="#两阶段提交协议（2PC：TWO-Phrase-Commit" class="headerlink" title="两阶段提交协议（2PC：TWO-Phrase Commit"></a>两阶段提交协议（2PC：TWO-Phrase Commit</h3><p>）</p>
+<p>两阶段提交协议的目标在于分布式系统中保证数据的一致性，许多分布式系统采用该协议提供对分布式事务的支持。顾名思义。该协议将一个分布式的事务过程拆分成两个阶段：投票阶段和事务提交阶段。为了让整个数据库集群能够正常的运行，该协议指定了一个‘协调者’单点，用于协调整个数据库集群的运行。为了简化描述，我们将数据库里面的各个阶段称为‘参与者’，三阶段提交协议中同样包含‘协调者’和‘参与者’这两个定义。</p>
+<h4 id="第一阶段：投票阶段"><a href="#第一阶段：投票阶段" class="headerlink" title="第一阶段：投票阶段"></a>第一阶段：投票阶段</h4><p>该阶段的主要目的在于打探数据库集群中的各个参与者是否能够正常的执行事务，具体如下：</p>
+<ol>
+<li>协调者向所有的参与者发送事务执行请求，并等待参与者反馈事务执行结果。</li>
+<li>事务参与者收到请求之后，执行事务但不提交，并记录事务日志</li>
+<li>参与者将自己事务执行情况反馈给协调者，同时阻塞等待协调者的后续指令。</li>
+</ol>
+<h4 id="第二阶段：事务提交阶段"><a href="#第二阶段：事务提交阶段" class="headerlink" title="第二阶段：事务提交阶段"></a>第二阶段：事务提交阶段</h4><p>在经过第一阶段协调者的询盘之后，各个参与者会回复自己事务的执行情况，这时候存在三种可能性：</p>
+<ol>
+<li>所有的参与者都回复能够正常执行事务</li>
+<li>一个或多个参与者回复事务执行失败</li>
+<li>协调者等待超时</li>
+</ol>
+<p>对于第一种情况，协调者将向所有的参与者发出提交事务的通知，具体步骤如下：</p>
+<ol>
+<li>协调者向各个参与者发送commit通知，请求提交事务</li>
+<li>参与者收到事务提交通知之后，执行commit操作，然后释放占用的资源</li>
+<li>参与者向协调者返回事务commit结果信息</li>
+</ol>
+<p>对于第二、三种情况，协调者均认为参与者无法成功执行事务，为了整个集群数据的一致性，所有要向各个参与者发送事务回滚通知，具体步骤如下：</p>
+<ol>
+<li>协调者向各个参与者发送事务Rollback通知，请求回滚事务。</li>
+<li>参与者收到事务回滚通知之后，执行rollback操作，然后释放占用的资源</li>
+<li>参与者向协调者返回事务rollback结果信息</li>
+</ol>
+<p>两阶段提交协议原理简单、易于实现，但是缺点也是显而易见主要缺点如下：</p>
+<ul>
+<li>单点问题</li>
+</ul>
+<p>协调者在整个两阶段提交过程中扮演着举足轻重的作用，一旦协调者所在服务器宕机，就会影响整个数据库集群的正常运行，比如在第二阶段中，如果协调者因为故障不能正常发送事务提交或回滚通知，那么参与者们将一直处于阻塞状态，整个数据库集群将无法提供服务。</p>
+<ul>
+<li>同步阻塞</li>
+</ul>
+<p>两阶段提交执行过程中，所有的参与者都需要听从协调者的统一调度，期间处于阻塞状态而不能从事其他操作，这样效率极其低下</p>
+<ul>
+<li>数据不一致性</li>
+</ul>
+<p>两阶段提交协议虽然是分布式数据一致性所设计，但仍然存在数据不一致性的可能性，比如在第二阶段中，假设协调者发出了事务commit通知，但是因为网络问题该通知仅被一部分参与者所收到并执行了commit操作，其余的参与者则因为没有收到通知一直处于阻塞状态，这时候就产生了数据的不一致性。</p>
+<p>针对上述问题可以引入超时机制和互询机制在很大程度上予以解决。对于协调者来说如果在指定时间内没有收到所有参与者的应答，则可以自动退出WAIT状态，并向所有参与者发送rollback通知。对于参与者来说如果位于READY状态，但是在指定时间内没有收到协调者的第二阶段通知，则不能武断地执行rollback操作，因为协调者可能发送的是commit通知，这个时候执行rollback就会导致数据不一致，此时，我们可以介入互询机制，让参与者A去询问其他参与者B的执行情况，如果B执行了rollback或commit操作，则A可以大胆的与B执行相同操作；如果B此时还没有到达READY状态，则可以推断协调者发出的肯定是rollback通知；如果B同样位于READY状态，则A可以继续询问另外的参与者，只有当所有的参与者都位于READY状态时，此时两阶段提交协议无法处理，将陷入长时间的阻塞状态。</p>
+<h3 id="三阶段提交协议（3PC：Three-Phrase-Commit）"><a href="#三阶段提交协议（3PC：Three-Phrase-Commit）" class="headerlink" title="三阶段提交协议（3PC：Three-Phrase Commit）"></a>三阶段提交协议（3PC：Three-Phrase Commit）</h3><p>针对两阶段提交存在的问题，三阶段提交协议通过引入一个“预询盘”阶段，以及超时策略来减少整个集群的阻塞时间，提升系统性能。三阶段提交的三个阶段分别为：can    _commit、pre_commit、do_commit</p>
+<h5 id="第一阶段：can-commit"><a href="#第一阶段：can-commit" class="headerlink" title="第一阶段：can_commit"></a>第一阶段：can_commit</h5><p>该阶段协调者回去询问各个参与者是否能够正常执行事务，参与者根据自身情况回复一个预估值，相对于真正的执行事务，这个过程是轻量的，具体步骤如下：</p>
+<ol>
+<li>协调者向各个参与者发送事务询问通知，询问是否可以执行事务操作，并等待回复</li>
+<li>各个参与者依据自身状态回复一个预估值，如果预估值自己能够正常执行事务就返回确定信息，并进入预备状态，否则返回否定信息</li>
+</ol>
+<h4 id="第二阶段：pre-commit"><a href="#第二阶段：pre-commit" class="headerlink" title="第二阶段：pre_commit"></a>第二阶段：pre_commit</h4><p>本阶段协调者会根据第一阶段的询盘结果采取相应操作，询盘结果主要有三种：</p>
+<ol>
+<li>所有的参与者都返回确定信息</li>
+<li>一个或多个参与者返回否定信息</li>
+<li>协调者等待超时</li>
+</ol>
+<p>针对第一种情况，协调者会向所有参与者发送事务执行请求，具体步骤如下：</p>
+<ol>
+<li>协调者向所有的事务参与者发送事务执行通知。</li>
+<li>参与者收到通知后，执行事务，但不提交</li>
+<li>参与者将事务执行情况返回给客户端</li>
+</ol>
+<p>在上述步骤中，如果参与者等待超时，则会中断事务。针对第二<br>三种情况，协调者认为事务无法正常执行，于是向各个参与者发出abort通知，请求退出预备状态，具体步骤如下：</p>
+<ol>
+<li>协调者向所有事务参与者发送abort通知。</li>
+<li>参与者收到通知后中断事务</li>
+</ol>
+<h4 id="第三阶段：do-commit"><a href="#第三阶段：do-commit" class="headerlink" title="第三阶段：do_commit"></a>第三阶段：do_commit</h4><p>如果第二阶段事务未中断，那么本阶段协调者将会依据事务执行返回的结果来决定提交或回滚事务，分为三种情况：</p>
+<ol>
+<li>所有的参与者都能正常执行事务</li>
+<li>一个或多个参与者执行事务失败</li>
+<li>协调者等待超时</li>
+</ol>
+<p>针对第一种情况，协调者向各个参与者发起事务提交请求，具体步骤如下：</p>
+<ol>
+<li>协调者向所有参与者发送事务commit通知</li>
+<li>所有参与者在收到通知之后执行commit操作。并释放占用的资源。</li>
+<li>参与者向协调者反馈事务提交结果。</li>
+</ol>
+<p>针对第二、三种情况，协调者认为事务无法成功执行，于是向各个参与者发送事务回滚请求，具体步骤如下：</p>
+<ol>
+<li>协调者向参与者发送事务Rollback通知</li>
+<li>所有参与者在收到通知之后执行rollback操作，并释放占用的资源。</li>
+<li>参与者向协调者反馈事务回滚结果</li>
+</ol>
+<p>在本阶段如果因为协调者或网络问题，导致参与者迟迟不能收到来自协调者的commit或rollback请求，那么参与者将不会如两阶段提交中那样陷入阻塞，而是等待超时后继续commit，相对于两阶段提交虽然降低了同步阻塞，但仍然无法完全避免数据的不一致</p>
+<p>两阶段提交协议中所存在的长时间阻塞状态发生的几率还是非常低的，所以虽然三阶段提交协议相对于两阶段提交协议来说数据强一致性更有保障，但是因为效率问题，两阶段提交协议在实际系统中反而更加受宠。在分布式数据库中，如果期望达到数据的强一致性，则服务基本没有可用性可言，这也是为什么许多分布式数据库提供了跨库事务，但也只是个摆设的原因，在实际应用中我们追求的更多是数据的弱一致性</p>
+<h3 id="2pc与3pc的区别"><a href="#2pc与3pc的区别" class="headerlink" title="2pc与3pc的区别"></a>2pc与3pc的区别</h3><p>相对于2pc,3pc主要解决的单点故障问题，并减少阻塞，因为一旦参与者无法及时收到来自协调者的信息之后，他会默认执行commit。而不会一直持有</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/架构/" rel="tag"># 架构</a>
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/10/20/php哈希算法/" rel="next" title="php哈希算法">
+                <i class="fa fa-chevron-left"></i> php哈希算法
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/20/Redis集群/" rel="prev" title="redis集群原理">
+                redis集群原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zengyuanye</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式一致性协议"><span class="nav-number">1.</span> <span class="nav-text">分布式一致性协议</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两阶段提交协议（2PC：TWO-Phrase-Commit"><span class="nav-number">2.</span> <span class="nav-text">两阶段提交协议（2PC：TWO-Phrase Commit</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#第一阶段：投票阶段"><span class="nav-number">2.1.</span> <span class="nav-text">第一阶段：投票阶段</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第二阶段：事务提交阶段"><span class="nav-number">2.2.</span> <span class="nav-text">第二阶段：事务提交阶段</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#三阶段提交协议（3PC：Three-Phrase-Commit）"><span class="nav-number">3.</span> <span class="nav-text">三阶段提交协议（3PC：Three-Phrase Commit）</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#第一阶段：can-commit"><span class="nav-number">3.0.1.</span> <span class="nav-text">第一阶段：can_commit</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第二阶段：pre-commit"><span class="nav-number">3.1.</span> <span class="nav-text">第二阶段：pre_commit</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#第三阶段：do-commit"><span class="nav-number">3.2.</span> <span class="nav-text">第三阶段：do_commit</span></a></li></ol><li class="nav-item nav-level-3"><a class="nav-link" href="#2pc与3pc的区别"><span class="nav-number">4.</span> <span class="nav-text">2pc与3pc的区别</span></a></li></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zengyuanye</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

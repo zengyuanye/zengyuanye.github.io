@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="无缓存io无缓存io是表示每个读取或写入都会在内核中调用系统调用,属于POSIX.1和Single UNIX，不属于ISO C,无缓存io函数主要有open,read,write,lseek,close">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件io_1">
+<meta property="og:url" content="http://yoursite.com/2019/03/28/文件io-1/index.html">
+<meta property="og:site_name" content="zengyuanye">
+<meta property="og:description" content="无缓存io无缓存io是表示每个读取或写入都会在内核中调用系统调用,属于POSIX.1和Single UNIX，不属于ISO C,无缓存io函数主要有open,read,write,lseek,close">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-03-28T10:13:08.754Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="文件io_1">
+<meta name="twitter:description" content="无缓存io无缓存io是表示每个读取或写入都会在内核中调用系统调用,属于POSIX.1和Single UNIX，不属于ISO C,无缓存io函数主要有open,read,write,lseek,close">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/28/文件io-1/">
+
+
+
+
+
+  <title>文件io_1 | zengyuanye</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zengyuanye</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/28/文件io-1/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zengyuanye">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zengyuanye">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">文件io_1</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-28T17:04:40+08:00">
+                2019-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apue/" itemprop="url" rel="index">
+                    <span itemprop="name">apue</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="无缓存io"><a href="#无缓存io" class="headerlink" title="无缓存io"></a>无缓存io</h3><p>无缓存io是表示每个读取或写入都会在内核中调用系统调用,属于POSIX.1和Single UNIX，不属于ISO C,无缓存io函数主要有open,read,write,lseek,close<br><a id="more"></a></p>
+<h3 id="文件描述符"><a href="#文件描述符" class="headerlink" title="文件描述符"></a>文件描述符</h3><ol>
+<li>当打开或者创建一个文件的时候，内核将会返回一个文件描述符给进程.</li>
+<li>文件描述符是一个非负整数.</li>
+<li>shell环境将会默认的将基本输入，基本输出，基本错误设置为0,1,2。</li>
+<li>为了可读性,unistd.h又将三个文件描述符声明成STDIN_FILENO, STDOUT_FILENO, and STDERR_FILENO常量</li>
+<li>文件描述符的范围是0-OPEN_MAX-1即0-系统最大打开个数减1<br>6.早期每个进程能打开的最大文件描述符的数量是20,后来多少系统都已经提升到了63,可以从常量 FD_SIZE查看本地配置</li>
+</ol>
+<h3 id="文件名和路径截断"><a href="#文件名和路径截断" class="headerlink" title="文件名和路径截断"></a>文件名和路径截断</h3><p>如果文件名字符长度大于NAME_MAX,有的系统会截断至NAME_MAX大小,有的会产生ENANETOOLONG错误.是否截取文件名字符,取决于_POSIX_NO_TRANC设置</p>
+<h3 id="open和openat函数"><a href="#open和openat函数" class="headerlink" title="open和openat函数"></a>open和openat函数</h3><p>文件打开或者创建可以使用open或者openat函数</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">open</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path,<span class="keyword">int</span> oflag,...<span class="comment">/* mode_t mode */</span>)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">openat</span><span class="params">(<span class="keyword">int</span> fd,<span class="keyword">const</span> <span class="keyword">char</span> *path,<span class="keyword">int</span> oflag,...<span class="comment">/* mode_t mode */</span>)</span></span>;</span><br><span class="line">两者都返回文件描述符,错误返回<span class="number">-1</span></span><br></pre></td></tr></table></figure>
+<p>最后一个参数是用来设置创建文件O_CREAT<br>oflag是一系列常量用来控制文件访问权限,这些常量都定义在&lt;fcntl.h&gt;,这些常量一般都是以或运算一起使用,O_RDONLY|O_APPEND</p>
+<h3 id="文件权限控制常量"><a href="#文件权限控制常量" class="headerlink" title="文件权限控制常量"></a>文件权限控制常量</h3><ol>
+<li>O_RDONLY 打开只读</li>
+<li>O_WRONLY 打开只写</li>
+<li>O_RDWR 打开可写可读</li>
+<li>O_EXEC 打开只执行</li>
+<li>O_SEARCH 只能查询(针对目录)</li>
+</ol>
+<p>以上5个常量只能使用一次,以下的是可选的</p>
+<ol>
+<li>O_APPEND 每次写入到文件的末尾,即追加写</li>
+<li>O_CLOEXEC 设置FD_CLOEXEC文件描述符标志位</li>
+<li>O_CREAT 如果文件不存在则创建,这个是mode参数选项的值，mode参数指定访问文件位</li>
+<li>O_DIRECTORY 如果不是指向目录将会生成一个错误</li>
+<li>O_EXCL 如果O_CREAT声明的文件已存在将会产生一个错误,这个参数是用来测试文件是否存在,如果文件不存在判断操作是一个原子操作</li>
+<li>O_NOCTTY 如果路径指向的是终端设备，将不会分配作为控制终端设备给进程</li>
+<li>O_NOFOLLOW 如果路径指向symbolic link即软连接将会产生一个错误</li>
+<li>O_NONBLOCK 就是设置打开文件或io设置非阻塞</li>
+<li>O_SYNC 同步:每次写入操作都必须等会物理io操作完成,，包括更新由于写入而修改的文件属性所需的I/O</li>
+<li>O_TRUNC 如果文件存在且成功以只写或可读可写打开文件，将会将文件长度截短到0;覆盖写</li>
+<li><p>O_TTY_INIT 打开尚未打开的终端设备时，将非标准termios参数设置为导致符合Single UNIX Specification的行为的值</p>
+</li>
+<li><p>O_DSYNC 每次写入等待物理I/O完成，但如果它们不影响读取刚写入的数据的能力，则不要等待文件属性更新</p>
+</li>
+<li><p>O_RSYNC 对文件描述符执行每次读取操作，等待文件的同一部分的任何挂起写入完成</p>
+</li>
+</ol>
+<h3 id="文件描述符参数fd"><a href="#文件描述符参数fd" class="headerlink" title="文件描述符参数fd"></a>文件描述符参数fd</h3><ol>
+<li>path参数声明一个绝对路径名,fd参数将被忽略,openat函数将会表现为open函数</li>
+<li>path参数声明一个相对路径,fd参数是一个文件描述符，它指定文件系统中要评估相对路径名的起始位置。 通过打开要评估相对路径名的目录来获取fd参数。</li>
+<li>path参数指定相对路径名，fd参数具有特殊值AT_FDCWD。 在这种情况下，路径名从当前工作目录开始计算，openat函数的行为类似于open函数</li>
+</ol>
+<h3 id="creat-函数"><a href="#creat-函数" class="headerlink" title="creat 函数"></a>creat 函数</h3><p>创建文件也可以使用creat函数<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">creat</span><span class="params">(<span class="keyword">const</span> <span class="keyword">char</span> *path,<span class="keyword">mode_t</span> mode)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">return</span>:file descriptor opened <span class="keyword">for</span> write only <span class="keyword">if</span> ok,<span class="number">-1</span> on error</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>这相当于使用函数 open(path,O_WRONLY|O_CREAT|O_TRUNC,mode);</li>
+<li>如果我们想创建一个文件即希望可读可写，这需要creat函数,close函数,最后再使用open函数,一种更好的方式是直接使用open函数open(path,O_RDWR|O_CREAT|O_TRUNC,mode);<h3 id="close函数"><a href="#close函数" class="headerlink" title="close函数"></a>close函数</h3></li>
+</ol>
+<p>打开的文件通过调用close函数关闭,当一个进程结束时，内核会自动关闭该进程打开的所以文件描述符,但是这个可以由更高级的操作控制是否退出<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span><span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">close</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<h3 id="lseek函数"><a href="#lseek函数" class="headerlink" title="lseek函数"></a>lseek函数</h3><p>每个打开的文件都会关联着当前文件下标,它是一个非负整数用来测量从文件开头到当前指针的比特数量，默认的初始化的文件下标为0，除非是使用了O_APPEND选项<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">off_t</span> lseek(<span class="keyword">int</span> fd,<span class="keyword">off_t</span> offset,<span class="keyword">int</span> whence);</span><br><span class="line"><span class="keyword">return</span>:<span class="keyword">new</span> file offset <span class="keyword">if</span> Ok,<span class="number">-1</span> on error</span><br><span class="line"><span class="keyword">off_t</span> 取决于系统配置大小,大部分是<span class="number">32</span>位或<span class="number">64</span>位</span><br></pre></td></tr></table></figure></p>
+<p>下标的解释取决于whence 参数</p>
+<ul>
+<li>如果whence 是SEEK_SET,那么文件下标设置为从文件开端到下标bytes。</li>
+<li>如果whence 是SEEK_CUR,那么文件下标设置为当前文件下标的值加上offset.offset可以正式或者负数</li>
+<li>如果whence 是SEEK_EDN,那么文件下标设置为文件大小加上offset.offset可以正式或者负数</li>
+</ul>
+<p>因为lseek函数成功时返回新的文件下标，那么我们可以使用一个0比特来确认文件的当前下标位置,lseek(fd,0,SEEK_CUR);如果fd参数是pipe,FIFO,socket,lseek会设置ESPIPE，并返回-1<br>如果lseek(fd,160003,SEEK_SET),write(fd,buf,10),可以使用od命令来查看,-c标志显示字符显示，中间空出来的160003将是\0补充，</p>
+<h3 id="read函数"><a href="#read函数" class="headerlink" title="read函数"></a>read函数</h3><p>使用read函数从打开的文件读取数据</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> read(<span class="keyword">int</span> fd,<span class="keyword">void</span> *buf,<span class="keyword">size_t</span> nbytes);</span><br><span class="line"></span><br><span class="line">returns:number of bytes read,<span class="number">0</span> <span class="keyword">if</span> end of file,<span class="number">-1</span> on error;</span><br></pre></td></tr></table></figure>
+<p>如果读取成功,将返回nbytes数量的内容,如果已在文件末尾返回0；以下是几种读取比特比请求少的的情况</p>
+<ol>
+<li>当读取一个普通文件时,如果整个文件长度大小是30比特,而我们尝试读100比特.read函数将返回30比特,再次读将返回0。</li>
+<li>当读取一个终端设备时,通常只能最多读取一行;</li>
+<li>当读取一个网络文件时,网络内的缓冲可能导致返回的请求数量少于所请求的数量。</li>
+<li>当读取一个pipe或者FIFO,如果pipe的比特长度比请求的少，read将返回它所能读取的</li>
+<li>从面向记录的设备读取时。 某些面向记录的设备（如磁带）一次最多可以返回一条记录。</li>
+<li>当被信号中断并且已经读取了部分数据时,将返回部分数据</li>
+</ol>
+<p>读操作从文件当前下标开始读,在结束之后，文件下标将递增到读取长度的大小,posix.1使用几种方式修改属性<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">read</span><span class="params">(<span class="keyword">int</span> fd,<span class="keyword">char</span> *buf,<span class="keyword">unsigned</span> nbytes)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<ol>
+<li>第三个参数char 变成void 将被当作是ISO C:类型void *用作无类型指针</li>
+<li>接下来，返回值必须是有符号整数（ssize_t）才能返回 正字节计数，0（对于文件结尾）或-1（对于错误）。</li>
+<li>最后，历史上第三个参数是无符号整数，允许16位实现一次读取或写入多达65,534个字节。 使用1990 POSIX.1标准，引入原始系统数据类型ssize_t以提供带符号的返回值，并使用unsigned size_t作为第三个参数<h3 id="write-函数"><a href="#write-函数" class="headerlink" title="write 函数"></a>write 函数</h3>使用write函数从一个已打开的文件写入数据<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> write(<span class="keyword">int</span> fd,<span class="keyword">const</span> <span class="keyword">void</span> *buf,<span class="keyword">size_t</span> nbytes);</span><br><span class="line">returns:number of bytes written <span class="keyword">if</span> ok ,<span class="number">-1</span> on errorl;</span><br></pre></td></tr></table></figure>
+</li>
+</ol>
+<p>返回值就是等于nbytes参数大小;否则将产生错误,通常导致write错误的原因是磁盘满了,超过进程给定的文件大戏，对于regular file,可以使用O_APPEND进行追加写</p>
+<h3 id="IO效率"><a href="#IO效率" class="headerlink" title="IO效率"></a>IO效率</h3><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">define</span> BUFFISIZE 4096</span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">main</span><span class="params">(<span class="keyword">void</span>)</span></span>&#123;</span><br><span class="line">    <span class="keyword">int</span> n;</span><br><span class="line">    <span class="keyword">char</span> buf[BUFFSIZE];</span><br><span class="line">    <span class="keyword">while</span>((n=read(STDIN_FILENO,buf,BUFFSIZE))&gt;<span class="number">0</span>)</span><br><span class="line">        <span class="keyword">if</span>(write(STDOUT_FILENO,buf,n)!=n)</span><br><span class="line">            perror(<span class="string">"write error"</span>);</span><br><span class="line">    <span class="keyword">if</span>(n&lt;<span class="number">0</span>)</span><br><span class="line">        perror(<span class="string">"read error"</span>);</span><br><span class="line">    <span class="built_in">exit</span>(<span class="number">0</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这次来讨论上面程序中buffsize大小在io执行中,buffsize设置多大的数值下，io效率最高呢？<br>经过测试发现BuffSize设置为4096效率达到最高</p>
+<h3 id="文件共享"><a href="#文件共享" class="headerlink" title="文件共享"></a>文件共享</h3><p>内核使用三种数据结构来描述一个打开的文件,它们之间的关系确定一个进程对文件共享的影响</p>
+<p>每个进程的进程表中有一个entry,在每个进程表条目中是一个打开文件描述符的表，我们可以将其视为一个向量，每个描述符有一个条目。 与每个文件描述符相关联</p>
+<ol>
+<li>文件描述符标志(close-on-exec)</li>
+<li>指向文件表条目的指针</li>
+</ol>
+<p>内核为所打开的文件维持一个文件表,每个文件表条目包含</p>
+<ol>
+<li>文件状态标志,例如read,write的append,sync,and nonblocking</li>
+<li>当前文件下标</li>
+<li>一个指向v-node表条目的文件指针</li>
+</ol>
+<p>每个打开的文件（或设备）都有一个v节点结构，其中包含有关文件类型和对文件操作的函数的指针的信息。 打开文件时，将从磁盘读取此信息，以便可以随时获得有关该文件的所有相关信息。 例如，i节点包含文件的所有者，文件的大小，指向文件的实际数据块位于磁盘上的指针，等等。</p>
+<p>我们先忽略那些不影响我们讨论的具体实现,例如打开文件描述符表可以存储在用户区域（可以分页的单独的每个进程结构）而不是进程表中。此外，这些表可以通过多种方式实现 - 它们不必是数组; 一个替代实现结构的链接列表。 无论实现细节如何，一般概念都保持不变。</p>
+<p>三个描述文件结构如下,它们打开两个不同文件:一个文件基本输入(fd 0 ),一个文件基本输出(fd 1)</p>
+<p>如果有两个独立的进程打开同一个文件，我们可以有如下安排</p>
+<p>我们假设第一个进程打开的文件描述符是fd 3,第二个进程打开的文件描述符是fd 4，每个打开的进程都有属于自己的文件表条目,但是它们共享这同一个v-node结构,存在那么一个原因是进程拥有属于自己的文件表，是为了记录各自的当前文件下标，鉴于这些数据结构，我们现在需要更具体地说明我们已经描述过的某些操作会发生什么。</p>
+<ol>
+<li>在每个write操作完成时,当前文件下标的大小将会增到写入文件的大小,如果这导致当前文件偏移量超过当前文件大小，则i-node表条目中的当前文件大小将设置为当前文件偏移量</li>
+<li>使用O_APPEND标志打开文件，在文件表条目的文件状态标志中设置相应的标志。 每次对设置了此附加标志的文件执行写入时，首先将文件表条目中的当前文件偏移量设置为来自索引节点表条目的当前文件大小。 这会强制将每个写入附加到文件的当前结尾。</li>
+<li>如果使用lseek将文件定位到其当前文件末尾，则所有发生的情况是文件表条目中的当前文件偏移量将从i节点表条目设置为当前文件大小。 （请注意，这与使用O_APPEND标志打开文件时不同</li>
+<li>lseek函数仅修改文件表条目中的当前文件偏移量。 没有I / O发生。</li>
+</ol>
+<p>请注意文件描述符标志和文件状态标志之间的范围差异。 前者仅适用于单个进程中的单个描述符，而后者适用于指向给定文件表条目的任何进程中的所有描述符。 当我们在3.14节描述fcntl函数时，我们将看到如何获取和修改文件描述符标志和文件状态标志。<br>到目前为止，我们在本节中描述的所有内容都适用于读取同一文件的多个进程。 每个进程都有自己的文件表条目，其中包含自己的当前文件偏移量。 但是，当多个进程写入同一文件时，可能会出现意外结果。 要了解如何避免一些意外，我们需要了解原子操作的概念</p>
+<h3 id="原子操作"><a href="#原子操作" class="headerlink" title="原子操作"></a>原子操作</h3><p>当两个进程a,b同时竞争资源时,a lseek长度1500到达文件末尾，blseek长度1500到达文件末尾,b写入到1600,然后a写入1600,此时，将覆盖b之前写入的。再单进程中，每次写入之前，都lseek到文件末尾,再调用write函数写入,程序正常<br>在多进程竞争资源的时候就会出现问题，所以内核引用两个原子操作pread和pwrite函数<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="keyword">ssize_t</span> pread(<span class="keyword">int</span> fd,<span class="keyword">void</span> *buf,<span class="keyword">size_t</span> nbytes,<span class="keyword">off_t</span> offset);</span><br><span class="line"><span class="keyword">ssize_t</span> pwrite(<span class="keyword">int</span> fd,<span class="keyword">const</span> <span class="keyword">void</span> *buf,<span class="keyword">size_t</span> nbytes,<span class="keyword">off_t</span> offset);</span><br><span class="line"><span class="number">-1</span> on error</span><br></pre></td></tr></table></figure></p>
+<p>调用pread等同于在每次调用read之前调用lseek，</p>
+<p>当我们调用pread时，无法中断这两个操作的发生<br>当前文件下标不会更新</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/28/文件和目录系统/" rel="next" title="文件和目录系统">
+                <i class="fa fa-chevron-left"></i> 文件和目录系统
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/28/文件io-2/" rel="prev" title="文件io_2">
+                文件io_2 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zengyuanye</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#无缓存io"><span class="nav-number">1.</span> <span class="nav-text">无缓存io</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件描述符"><span class="nav-number">2.</span> <span class="nav-text">文件描述符</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件名和路径截断"><span class="nav-number">3.</span> <span class="nav-text">文件名和路径截断</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#open和openat函数"><span class="nav-number">4.</span> <span class="nav-text">open和openat函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件权限控制常量"><span class="nav-number">5.</span> <span class="nav-text">文件权限控制常量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件描述符参数fd"><span class="nav-number">6.</span> <span class="nav-text">文件描述符参数fd</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#creat-函数"><span class="nav-number">7.</span> <span class="nav-text">creat 函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#close函数"><span class="nav-number">8.</span> <span class="nav-text">close函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#lseek函数"><span class="nav-number">9.</span> <span class="nav-text">lseek函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#read函数"><span class="nav-number">10.</span> <span class="nav-text">read函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#write-函数"><span class="nav-number">11.</span> <span class="nav-text">write 函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#IO效率"><span class="nav-number">12.</span> <span class="nav-text">IO效率</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#文件共享"><span class="nav-number">13.</span> <span class="nav-text">文件共享</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#原子操作"><span class="nav-number">14.</span> <span class="nav-text">原子操作</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zengyuanye</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

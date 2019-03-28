@@ -1,0 +1,775 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="分布式,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="分布式系统中的缓存架(转)缓存是解决高并发与高可用的一种非常常见的手段，也是面试时，面试官最喜欢问的问题。">
+<meta name="keywords" content="分布式">
+<meta property="og:type" content="article">
+<meta property="og:title" content="分布式系统中的缓存架">
+<meta property="og:url" content="http://yoursite.com/2019/03/20/分布式系统中的缓存架(转)/index.html">
+<meta property="og:site_name" content="zengyuanye">
+<meta property="og:description" content="分布式系统中的缓存架(转)缓存是解决高并发与高可用的一种非常常见的手段，也是面试时，面试官最喜欢问的问题。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://dopro.io/wp-content/uploads/2018/07/http-cdn-example.png">
+<meta property="og:image" content="http://dopro.io/wp-content/uploads/2018/07/http-cdn-http-process.jpg">
+<meta property="og:image" content="http://dopro.io/wp-content/uploads/2018/07/http-cdn-cdn-process.jpg">
+<meta property="og:updated_time" content="2019-03-28T10:13:08.753Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="分布式系统中的缓存架">
+<meta name="twitter:description" content="分布式系统中的缓存架(转)缓存是解决高并发与高可用的一种非常常见的手段，也是面试时，面试官最喜欢问的问题。">
+<meta name="twitter:image" content="http://dopro.io/wp-content/uploads/2018/07/http-cdn-example.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/20/分布式系统中的缓存架(转)/">
+
+
+
+
+
+  <title>分布式系统中的缓存架 | zengyuanye</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zengyuanye</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/20/分布式系统中的缓存架(转)/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zengyuanye">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zengyuanye">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">分布式系统中的缓存架</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-20T18:00:21+08:00">
+                2019-03-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/架构/" itemprop="url" rel="index">
+                    <span itemprop="name">架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="分布式系统中的缓存架-转"><a href="#分布式系统中的缓存架-转" class="headerlink" title="分布式系统中的缓存架(转)"></a>分布式系统中的缓存架(转)</h3><p>缓存是解决高并发与高可用的一种非常常见的手段，也是面试时，面试官最喜欢问的问题。</p>
+<a id="more"></a>
+<h3 id="缓存概述"><a href="#缓存概述" class="headerlink" title="缓存概述"></a>缓存概述</h3><ol>
+<li>概念:用于存储数据的硬件或软件的组成的部分，已使得后序更快访问相应的数据,缓存中的数据可能是提前计算好的结果、数据副本等。</li>
+<li>作用:缓存是分布式系统中的重要组件,主要解决高并发、大数据场景下、热点数据访问的性能问题。提供高性能的数据快速访问。</li>
+<li>原理:将数据写入/读取速度更快的存储;将数据缓存在离应用最近的位置;将数据缓存到离用户最近的位置</li>
+</ol>
+<h3 id="缓存的分类"><a href="#缓存的分类" class="headerlink" title="缓存的分类"></a>缓存的分类</h3><ol start="2">
+<li>浏览器缓存</li>
+<li>CDN缓存</li>
+<li>反向代理缓存</li>
+<li>本地应用缓存</li>
+<li>分布式缓存</li>
+</ol>
+<h4 id="分布式缓存"><a href="#分布式缓存" class="headerlink" title="分布式缓存"></a>分布式缓存</h4><h4 id="客户端缓存"><a href="#客户端缓存" class="headerlink" title="客户端缓存"></a>客户端缓存</h4><p>客户端缓存。浏览器作为客户端接受到服务器响应后对于响应首部字段进行解析,分析出相应的缓存规则,将资源按规则进行缓存，再次请求时按规则进行缓存，再次请求时如果命中缓存则直接读取本地缓存不在发出请求（可以查看Response头信息）</p>
+<h5 id="缓存规则"><a href="#缓存规则" class="headerlink" title="缓存规则"></a>缓存规则</h5><p>缓存规则有响应首部字段进行控制，其中的关键字段有Expires、Cache-Control、Last-Modified、Etag四个字段，Expires和Cache-Control用来确定缓存的存储时间,Last-Modified和Etag则用来确定缓存是否要被更新</p>
+<ul>
+<li>expires:Http1.0中用来控制缓存时间的参数，响应头包含日期/时间,即在此时间之后,响应过期。</li>
+<li><p>cache-Control:Http1.1中用来控制缓存时间的参数</p>
+<ul>
+<li>public:表明响应可以被任何对象（包括:发送请求的客户端，代理服务器，等等）缓存。</li>
+<li>private:表明响应只能被单个用户缓存，不能作为共享缓存（即代理服务器不能缓存它）</li>
+<li>max-age=<seconds>:设置缓存存储的最大周期,相对于请求的时间缓存seconds秒,在此时间内，访问资源直接读取本地缓存，不向服务器发出请求（与expire同时出现时,max-age优先级更高）</seconds></li>
+<li>s-maxage=<seconds>:规则等同max-age,覆盖max-age或者Expires头,但是仅适用于共享缓存(比如各个代理)，并且私有缓存中它被忽略。(与expires或max-age同时出现时,s-maxage优先级更高)</seconds></li>
+</ul>
+</li>
+<li><p>Last-modified:源头服务器认定的资源做出修改的日期及时间。精确度比Etag低。包含有if-Modified-Since或if-Unmodified-Since首部的条件请求会使用这个字段。</p>
+</li>
+<li>Etag:HTTP响应头的资源特定版本的标识符。</li>
+</ul>
+<h5 id="缓存流程"><a href="#缓存流程" class="headerlink" title="缓存流程"></a>缓存流程</h5><p>  <img src="http://dopro.io/wp-content/uploads/2018/07/http-cdn-example.png" alt><br>  <img src="http://dopro.io/wp-content/uploads/2018/07/http-cdn-http-process.jpg" alt> </p>
+<p>缓存规则在其中是如何起作用的</p>
+<ul>
+<li>重点关注1:缓存是否过期，基于该资源上次响应缓存规则同时满足下列条件则视为缓存未过期，需要注意的是，判断缓存是否过期只跟客户端有关系，与服务器无关。1&amp;2&amp;3&amp;同时满足即认为缓存未过期，相反则是已过期,cache-control的值为max-age,max-age&gt;0当前date&lt;上次请求时的date+max-age.expire可同等转化为cache-control=max-age形式，不再赘述，s-maxage与maxage规则相同</li>
+<li>重点关注2:缓存规则主要cache-control字段和expires字段体现，同时出现则以cache-control为准具体情况如下<ul>
+<li>cache-control = no-store 不缓存任何资源</li>
+<li>cache-control = no-cache 缓存但立即过期</li>
+<li>cache-control = max-age(s-maxage) = 0缓存但不立即过期，等同于no-cache</li>
+<li>cache-control = max-age(s-maxage) = seconds(seconds&gt;0)–基于请求时间缓存seconds秒</li>
+<li>last-Modified时间的差值的10%，等同于cache-control=max-age=（date – Last-Modified）/ 10，通过fiddler抓包可看到英文原文：No explicit HTTP Cache Lifetime information was provided.Heuristic expiration policies suggest defaulting to: 10% of the delta between Last-Modified and Date.</li>
+<li>expires = 过去的时间或无效时间，缓存但立即过期，等同于cache-control = no-cache</li>
+<li>expires = 未来时间，缓存到对应的时间</li>
+</ul>
+</li>
+</ul>
+<h4 id="CDN缓存"><a href="#CDN缓存" class="headerlink" title="CDN缓存"></a>CDN缓存</h4><ul>
+<li>CDN(Conten Delivery Network 内容分发网络)的基本原理是广泛采用各种缓存服务器,将这些缓存服务器分布到用户访问相对集中的地区或网络中。</li>
+<li>在用户访问网站时，利用全局负载技术将用户的访问指向距离最近的工作正常的缓存服务器上,由缓存服务器直接响应用户请求</li>
+<li>应用场景:主要缓存静态资源，例如图片，视频<br><img src="http://dopro.io/wp-content/uploads/2018/07/http-cdn-cdn-process.jpg" alt></li>
+</ul>
+<h5 id="缓存规则-1"><a href="#缓存规则-1" class="headerlink" title="缓存规则"></a>缓存规则</h5><p>CDN边缘节点缓存策略因服务商不同而不同，但一般都会遵循http标准协议，通过http响应头中的Cache-control: max-age的字段来设置CDN边缘节点数据缓存时间。</p>
+<p>当客户端向CDN节点请求数据时，CDN节点会判断缓存数据是否过期，若缓存数据并没有过期，则直接将缓存数据返回给客户端；否则，CDN节点就会向源站发出回源请求，从源站拉取最新数据，更新本地缓存，并将最新数据返回给客户端。</p>
+<p>CDN服务商一般会提供基于文件后缀、目录多个维度来指定CDN缓存时间，为用户提供更精细化的缓存管理。</p>
+<p>CDN缓存时间会对“回源率”产生直接的影响。若CDN缓存时间较短，CDN边缘节点上的数据会经常失效，导致频繁回源，增加了源站的负载，同时也增大的访问延时；若CDN缓存时间太长，会带来数据更新时间慢的问题。开发者需要增对特定的业务，来做特定的数据缓存时间管理</p>
+<h4 id="设置优良的网站缓存机制方法"><a href="#设置优良的网站缓存机制方法" class="headerlink" title="设置优良的网站缓存机制方法"></a>设置优良的网站缓存机制方法</h4><ul>
+<li>使用一致的 URLs — 这是使用缓存的黄金法则.如果你为不同的用户提供、或是从不同的网站采集相同的内容到不同的网站页面，请使用一条URL地址。For example,如果你一旦使用了 “/index.html” ，对于其他的 HTML 文件URL也采用相同的命名方式.</li>
+<li>使用图片库 来查阅不同地方使用的图片.</li>
+<li>创建缓存保存不常变动的图片和页面 ，可以把参数 Cache-Control: max-age 报头参数的值设置得大些.</li>
+<li>为规律更新的网页设置定时缓存， 可以设置合适的 max-age or expiration 时间参数.</li>
+<li>如果一个资源（尤其是可下载文件）改变了，把它的名字也改了. 用这种方式，你可以让缓存在很长的一段时间之后才过期，并且保证提供的版本是正确的。链接到改资源的网页需要将缓存时间设置得短一些.</li>
+<li>除非必要，不要随意修改文件. 如果随意修改,报头参数 Last-Modified 将始终使用最新的日期.比如,当你升级网站,不要复制整个站点; 只要移动你修改的文件即可.</li>
+<li>只在有必要的地方使用cookies — cookies 非常难缓存, 大多数情况也没必要缓存.如果你一定需要有cookies,将它们限制在动态页面中.</li>
+<li>尽量少地使用 SSL安全协议 — 因为加密的页面将不会采用共享缓存的方式储存，尽量在需要的时候使用SSL, 并且在SSL页面尽量少用图片.</li>
+<li>用 REDbot检测你的网站页面— 本教程所描述的大多数概念在使用该工具时都很有用</li>
+<li>如非必要，尽量不使用 POST方式. 大多数的缓存无法保持对POST方式响应，你过你想通过路径或请求（GET）发送一些信息，缓存能够在未来存贮信息。</li>
+</ul>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/分布式/" rel="tag"># 分布式</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/20/面试-分布式之消息队列要点复习/" rel="next" title="分布式之消息队列要点复习">
+                <i class="fa fa-chevron-left"></i> 分布式之消息队列要点复习
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/20/PHP数组实现原理/" rel="prev" title="PHP数组实现原理">
+                PHP数组实现原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zengyuanye</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#分布式系统中的缓存架-转"><span class="nav-number">1.</span> <span class="nav-text">分布式系统中的缓存架(转)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存概述"><span class="nav-number">2.</span> <span class="nav-text">缓存概述</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#缓存的分类"><span class="nav-number">3.</span> <span class="nav-text">缓存的分类</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#分布式缓存"><span class="nav-number">3.1.</span> <span class="nav-text">分布式缓存</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#客户端缓存"><span class="nav-number">3.2.</span> <span class="nav-text">客户端缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#缓存规则"><span class="nav-number">3.2.1.</span> <span class="nav-text">缓存规则</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#缓存流程"><span class="nav-number">3.2.2.</span> <span class="nav-text">缓存流程</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#CDN缓存"><span class="nav-number">3.3.</span> <span class="nav-text">CDN缓存</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#缓存规则-1"><span class="nav-number">3.3.1.</span> <span class="nav-text">缓存规则</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#设置优良的网站缓存机制方法"><span class="nav-number">3.4.</span> <span class="nav-text">设置优良的网站缓存机制方法</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zengyuanye</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

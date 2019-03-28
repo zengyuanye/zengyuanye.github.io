@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="dup和dup2函数一个存在的文件描述符可以被以下函数所复制123int dup(int fd);int dup2(int fd,int fd2);return 新的文件描述符,或-1">
+<meta property="og:type" content="article">
+<meta property="og:title" content="文件io_2">
+<meta property="og:url" content="http://yoursite.com/2019/03/28/文件io-2/index.html">
+<meta property="og:site_name" content="zengyuanye">
+<meta property="og:description" content="dup和dup2函数一个存在的文件描述符可以被以下函数所复制123int dup(int fd);int dup2(int fd,int fd2);return 新的文件描述符,或-1">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/1553764866445.jpg">
+<meta property="og:image" content="http://yoursite.com/images/1553764999985.jpg">
+<meta property="og:updated_time" content="2019-03-28T10:13:08.754Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="文件io_2">
+<meta name="twitter:description" content="dup和dup2函数一个存在的文件描述符可以被以下函数所复制123int dup(int fd);int dup2(int fd,int fd2);return 新的文件描述符,或-1">
+<meta name="twitter:image" content="http://yoursite.com/images/1553764866445.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/28/文件io-2/">
+
+
+
+
+
+  <title>文件io_2 | zengyuanye</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zengyuanye</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/28/文件io-2/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zengyuanye">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zengyuanye">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">文件io_2</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-28T17:12:57+08:00">
+                2019-03-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/apue/" itemprop="url" rel="index">
+                    <span itemprop="name">apue</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="dup和dup2函数"><a href="#dup和dup2函数" class="headerlink" title="dup和dup2函数"></a>dup和dup2函数</h3><p>一个存在的文件描述符可以被以下函数所复制<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">dup</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">dup2</span><span class="params">(<span class="keyword">int</span> fd,<span class="keyword">int</span> fd2)</span></span>;</span><br><span class="line"><span class="keyword">return</span> 新的文件描述符,或<span class="number">-1</span></span><br></pre></td></tr></table></figure></p>
+<a id="more"></a>
+<p>新的文件描述符可以保证是当前文件描述符是从最低递增起来的，例如当前存在的文件描述符最大值为2,那么新的文件描述符为3;dup2函数可以使用fd2参数指定新描述符的值。 如果fd2已经打开，那么内核首先会关闭它。 如果fd等于fd2，则dup2返回fd2而不是关闭它,否则dup2为fd2清除FD_CLOEXEC文件描述符标志，以便在进程调用exec时fd2保持打开状态。<br>新的文件描述符共享fd参数的文件表条目</p>
+<p><img src="/images/1553764866445.jpg" alt="block"></p>
+<p>在上图中，我们假设进程执行 newfd = dup(1);<br>假设下一个文件描述符是3，由于两个描述符都指向相同的文件表条目,那么read,write,append共享文件状态标志,当前文件文件下标.每个描述符都有属于自己的文件标示,<br>使用dup函数会清除新的文件描述符的close-on-exec标志,实现dup函数的功能也可以使用fcntl函数实现,</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">dup(fd) = fcntl(fd,F_DUPFD,<span class="number">0</span>);</span><br><span class="line">dup2(fd,fd2);</span><br><span class="line">close(fd2);</span><br><span class="line">fcntl(fd,F_DUPFD,<span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+<p>dup2是一个原子操作，而替代形式涉及两个函数调用。 在后一种情况下，有可能在close和fcntl之间调用一个可以修改文件描述符的信号捕获器。(我们将在第10章中描述信号。）如果不同的线程更改了文件描述符，则可能会出现同样的问题。</p>
+<p>dup2和fcntl之间可能存在一些错误</p>
+<h3 id="sync-fsync和fdatasync函数"><a href="#sync-fsync和fdatasync函数" class="headerlink" title="sync,fsync和fdatasync函数"></a>sync,fsync和fdatasync函数</h3><p>大多数磁盘i/o进程在内核中有一个缓存区缓存和页面缓存。当我们写入数据到文件时,数据被内核复制,写入内核的缓存区并且等待写入到磁盘中,这称为延迟写。通常是在需要为其他磁盘块重用缓冲区时，内核最后才将所有延迟写入块或磁盘,延迟写会导致某段时间内文件系统与缓冲区缓存内容不一致,假设在此期间发生掉电或者系统崩溃，则会导致所写数据来不及写至磁盘而丢失的情况. 系统为确保磁盘上文件系统与缓冲区缓存内容的一致性，提供了sync，fsync和fdatasync功能,内核会复制缓冲区的数据写入存储介质,写入完成后才清除缓存区的数据。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fsync</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fdatasync</span><span class="params">(<span class="keyword">int</span> fd)</span></span>;</span><br><span class="line"><span class="comment">//成功返回0,否则返回-1</span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">sync</span><span class="params">(<span class="keyword">void</span>)</span></span>;</span><br></pre></td></tr></table></figure></p>
+<p>sync函数简单地将所有已修改的块缓冲区排队以写入和返回; 它不会等待磁盘写入操作.。sync函数通常被系统守护程序定期(一般为30秒)调用,这个操作被叫做更新.这可以保证定期刷新内核的块缓冲区</p>
+<p>fsync函数指向一个fd文件描述符解析的单独的文件,会等待磁盘完全写入才返回.这些函数通常用于数据库,需要确认被修改的内容已经写入的磁盘的操作。<br>fdatasync函数与fsync相似,但是它仅影响文件的数据部分,而fsync函数，会同步更新文件的属性。</p>
+<h3 id="fcntl函数"><a href="#fcntl函数" class="headerlink" title="fcntl函数"></a>fcntl函数</h3><p>fcntl函数用于更改已打开文件的属性</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">fcntl</span><span class="params">(<span class="keyword">int</span> fd,<span class="keyword">int</span> cmd,...<span class="comment">/* int arg */</span>)</span></span>;</span><br><span class="line"><span class="comment">//错误返回-1</span></span><br></pre></td></tr></table></figure>
+<p>在这个例子中,第三个参数通常是int,但是，当我们在第14.3节中描述记录锁定时，第三个参数成为指向结构的指针。fcntl函数一般用于5个不同的目的</p>
+<ol>
+<li>复制一个已存在的文件描述符(cmd=F_DUPFD or F_DUPFD_CLOEXEC)</li>
+<li>获取/设置文件描述符标志(cmd=F_GETFD or F_SETFD)</li>
+<li>获取/设置文件状态标志(cmd=F_GETFL or F_SETFL);</li>
+<li>获取/设置异步I/O所有权(cmd=F_GETOWN or F_SETOWN)</li>
+<li>获取/设置记录锁(cmd=F_GETLK,F_SETLK,or F_SETLKW)</li>
+</ol>
+<p>讨论与进程表条目中的每个文件描述符相关联的文件描述符标志和与每个文件表条目相关联的文件状态标志。</p>
+<ol>
+<li>F_DUPFD 复制文件描述符fd,新的文件描述符会从函数返回,它是编号最小的文件描述符,并且大于或等于第三个参数,新描述符与fd共享相同的文件表条目,但是新描述符有自己的文件描述符标志集,并清除其FD_CLOEXEC文件描述标志（这意味着描述符在exec上保持打开状态）,CLOEXEC就是exec函数调用时,文件描述符是关闭的,其他是打开的.目的是fork子进程后在子进程中直接执行close关掉无用的文件描述符，”这个句柄我在fork子进程后执行exec时就关闭”</li>
+<li>F_DUPFD_CLOEXEC 复制文件描述符并设置与新描述符关联的FD_CLOEXEC文件描述符标志。 返回新的文件描述符</li>
+<li>F_GETFD 返回当前文件描述符fd的标志,当前只有FD_CLOEXEC标志被定义</li>
+<li>F_SETFD 设置新的文件标志,新标志通过第三个参数设置</li>
+<li>F_GETFL 返回fd文件状态标志,标志是open函数介绍过的参数,O_RDONLY,O_WRONLY,O_RDWR,O_EXEC,O_SEARCH;O_APPEND,O_NONBLOCK,O_SYNC,O_DSYNC,O_RSYNC,O_FSYNC,O_ASYNC,不幸的是，五个访问模式标志-O_RDONLY，O_WRONLY，O_RDWR，O_EXEC和O_SEARCH不能一起使用。 （正如我们前面提到的，由于历史原因，前三个通常分别具有值0,1和2。此外，这五个值是互斥的;文件只能启用其中一个。）因此，我们必须 首先使用O_ACCMODE掩码获取访问模式位，然后将结果与五个值中的任何一个进行比较。</li>
+<li>F_SETFL 通过第三个参数设置文件状态标志,O_RDONLY,O_WRONLY,O_RDWR,O_EXEC,O_SEARCH只能设置一个</li>
+<li>F_GETOWN 获取进程ID或者进程组ID当前接收到SIGIO和SIGURG信号，</li>
+<li>F_SETOWN 设置进程ID或进程组ID以接收SIGIO和SIGURG信号。 正arg指定进程ID。 负arg意味着进程组ID等于arg的绝对值</li>
+</ol>
+<p>fcntl的返回值取决于命令。 如果出现错误，所有命令在错误或其他值上返回-1。 以下四个命令具有特殊的返回值：F_DUPFD，F_GETFD，F_GETFL和F_GETOWN。 第一个命令返回新的文件描述符，接下来的两个返回相应的标志，最后一个命令返回一个肯定的进程ID或一个负的进程组ID。</p>
+<p>当我们修改文件描述符标志或文件状态标志时，我们必须小心获取现有标志值，根据需要修改它，然后设置新标志值。 我们不能简单地发出F_SETFD或F_SETFL命令，因为这可能会关闭先前设置的标志位。<br><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">"apue.h"</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;fcntl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">void</span> <span class="title">set_fl</span><span class="params">(<span class="keyword">int</span> fd, <span class="keyword">int</span> flag)</span></span>&#123;</span><br><span class="line">   <span class="keyword">int</span> val;</span><br><span class="line">   <span class="keyword">if</span>((val=fcntl(fd,F_GETFL,<span class="number">0</span>))&lt;<span class="number">0</span>)</span><br><span class="line">       err_sys(<span class="string">"fcntl F_GETFL error"</span>);</span><br><span class="line">   val |=flags;</span><br><span class="line"></span><br><span class="line">   <span class="keyword">if</span>(fcntl(fd,F_SETFL,val)&lt;<span class="number">0</span>)</span><br><span class="line">       err_sys(<span class="string">"eror"</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p>如果添加一行set_fl(STDOUT_FILENO, O_SYNC); 表示打开同步写标志,这会导致每次写入数据到磁盘时必须等待写入完成后才返回结果。通常在unix系统中，写入操作仅仅为数据排队写入,数据写入到磁盘这个操作将会在之后执行,数据系统在使用了O_SYNC标志后变成了一个备份,所以如果系统出现异常故障,只要写入操作返回了,我们也就知道数据已经写入了。我们对比一下写入操作使用O_SYNC等同步标志后系统时钟的变化</p>
+<p><img src="/images/1553764999985.jpg" alt="block"></p>
+<p>6行都使用了4096比特来测量</p>
+<ol>
+<li>第一行使用read读取数据在写入到/dev/null,没有输出</li>
+<li>第二行读取磁盘文件数据,写入到另一个文件,系统时间略有增加,因为内核需要复制数据,和等待数据写入。</li>
+<li>当我们开启同步写是，系统时钟和时钟时间明显提高。正如第三行所示,同步写入的系统时间并不比我们使用延迟写入时花费得多。 这意味着Linux操作系统正在为延迟和同步写入执行相同的工作量（这是不太可能的），否则O_SYNC标志没有达到预期的效果。 在这种情况下，Linux操作系统不允许我们使用fcntl设置O_SYNC标志，而是在没有返回错误的情况下失败（但是如果我们能够在打开文件时指定它，那么它会尊重标志）。最后三行中的时钟时间反映了等待所有写入提交到磁盘所需的额外时间。 在同步写入文件之后，我们希望对fsync的调用无效。 这种情况应该由最后一行表示,但由于O_SYNC标志没有预期的效果，最后一行的行为与第五行的行为相同。</li>
+</ol>
+<p>比较fsync和fdatasync，当我们这样说时，它们都会使用O_SYNC标志更新文件的内容，每次写入文件时都会更新文件的内容。 每种备选方案的性能取决于许多因素，包括底层操作系统实现，磁盘驱动器的速度以及文件系统的类型。通过这个例子，我们看到了对fcntl的需求。 我们的程序在描述符（标准输出）上运行，从不知道在该描述符上打开的文件的名称。 由于shell打开了文件，因此我们无法在打开文件时设置O_SYNC标志。 使用fcntl，我们可以修改描述符的属性，只知道打开文件的描述符。 当我们描述非阻塞管道时，我们将看到对fcntl的另一个需求（第15.2节），因为我们所有的管道都是描述符。</p>
+<h3 id="ioctl函数-硬件驱动控制"><a href="#ioctl函数-硬件驱动控制" class="headerlink" title="ioctl函数(硬件驱动控制)"></a>ioctl函数(硬件驱动控制)</h3><p>ioctl函数是I/O操作的重要组成部分,中断I/O是这个函数的最多使用者,大部分驱动需要 – 除了读写设备的能力 – 通过设备驱动进行各种硬件控制的能力. 大部分设备可进行超出简单的数据传输之外的操作; 用户空间必须常常能够请求, 例如, 设备锁上它的门, 弹出它的介质, 报告错误信息, 改变波特率, 或者自我销毁. 这些操作常常通过 ioctl 方法来支持, 它通过相同名子的系统调用来实现.</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;unistd.h&gt;</span></span></span><br><span class="line"><span class="meta">#<span class="meta-keyword">include</span> <span class="meta-string">&lt;sys/ioctl.h&gt;</span></span></span><br><span class="line"><span class="function"><span class="keyword">int</span> <span class="title">ioctl</span><span class="params">(<span class="keyword">int</span> fd,<span class="keyword">int</span> request,...)</span></span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">//错误返回-1</span></span><br></pre></td></tr></table></figure>
+<h3 id="dev-fd"><a href="#dev-fd" class="headerlink" title="/dev/fd"></a>/dev/fd</h3><p>比较新的系统提供一个目录名为/dev/fd,这里面的文件命名为0,1,2等等.打开文件/dev/fd/n 等同于文件描述符n的副本,当然这个文件描述符必须是已打开的。在函数调用fd = open(“dev/fd/0”,mode);<br>/dev/fd的Linux实现是一个异常。它将文件描述符映射到指向底层物理文件的符号链接。 例如，当您打开/dev/fd/0时，您实际上是打开与标准输入关联的文件。 因此，返回的新文件描述符的模式与/dev/fd文件描述符的模式无关。 dev/fd文件的主要用途来自shell。 它允许使用路径名参数的程序以与其他路径名相同的方式处理标准输入和标准输出。 例如，cat（1）程序专门查找输入文件名 - 并将其用于表示标准输入。 命令filter file2 | cat file1 - file3 | lpr这个例子。 首先，cat读取file1，然后读取其标准输入（file2上的过滤器程序的输出），然后读取file3。 如果支持/dev/fd，可以从cat中删除 - 的特殊处理，我们可以输入filter file2 | cat file1 /dev/fd/0 file3 | lpr -特殊含义: 作为参考标准输入或标准输出的命令行参数是一个悄悄进入许多程序的kludge。 如果我们指定 - 作为第一个文件，它看起来像另一个命令行选项的开头，也会出现问题。 使用/dev/fd是迈向均匀性和清洁度的一步。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/28/文件io-1/" rel="next" title="文件io_1">
+                <i class="fa fa-chevron-left"></i> 文件io_1
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zengyuanye</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#dup和dup2函数"><span class="nav-number">1.</span> <span class="nav-text">dup和dup2函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#sync-fsync和fdatasync函数"><span class="nav-number">2.</span> <span class="nav-text">sync,fsync和fdatasync函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#fcntl函数"><span class="nav-number">3.</span> <span class="nav-text">fcntl函数</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ioctl函数-硬件驱动控制"><span class="nav-number">4.</span> <span class="nav-text">ioctl函数(硬件驱动控制)</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dev-fd"><span class="nav-number">5.</span> <span class="nav-text">/dev/fd</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zengyuanye</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next muse use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="架构,redis,">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="Redis集群Redis集群提供一种方式自动将数据分布在多个Redis节点上。使用cluster集群方式，node节点配置主从。 Redis集群并不支持处理多个keys的命令,因为这需要在不同的节点间移动数据,从而达不到像Redis那样的性能,在高负载的情况下可能会导致不可预料的错误.">
+<meta name="keywords" content="架构,redis">
+<meta property="og:type" content="article">
+<meta property="og:title" content="redis集群原理">
+<meta property="og:url" content="http://yoursite.com/2019/03/20/Redis集群/index.html">
+<meta property="og:site_name" content="zengyuanye">
+<meta property="og:description" content="Redis集群Redis集群提供一种方式自动将数据分布在多个Redis节点上。使用cluster集群方式，node节点配置主从。 Redis集群并不支持处理多个keys的命令,因为这需要在不同的节点间移动数据,从而达不到像Redis那样的性能,在高负载的情况下可能会导致不可预料的错误.">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-03-28T10:13:08.751Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="redis集群原理">
+<meta name="twitter:description" content="Redis集群Redis集群提供一种方式自动将数据分布在多个Redis节点上。使用cluster集群方式，node节点配置主从。 Redis集群并不支持处理多个keys的命令,因为这需要在不同的节点间移动数据,从而达不到像Redis那样的性能,在高负载的情况下可能会导致不可预料的错误.">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Muse',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/03/20/Redis集群/">
+
+
+
+
+
+  <title>redis集群原理 | zengyuanye</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zengyuanye</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/03/20/Redis集群/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zengyuanye">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zengyuanye">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">redis集群原理</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-03-20T18:00:21+08:00">
+                2019-03-20
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/架构/" itemprop="url" rel="index">
+                    <span itemprop="name">架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="Redis集群"><a href="#Redis集群" class="headerlink" title="Redis集群"></a>Redis集群</h3><p>Redis集群提供一种方式自动将数据分布在多个Redis节点上。使用cluster集群方式，node节点配置主从。</p>
+<p>Redis集群并不支持处理多个keys的命令,因为这需要在不同的节点间移动数据,从而达不到像Redis那样的性能,在高负载的情况下可能会导致不可预料的错误.</p>
+<a id="more"></a>
+<p>Redis 集群通过分区来提供一定程度的可用性,在实际环境中当某个节点宕机或者不可达的情况下继续处理命令. Redis 集群的优势:</p>
+<ul>
+<li>自动分割数据到不同的节点上。</li>
+<li>整个集群的部分节点失败或者不可达的情况下能够继续处理命令。</li>
+</ul>
+<h3 id="Redis集群的目标"><a href="#Redis集群的目标" class="headerlink" title="Redis集群的目标"></a>Redis集群的目标</h3><p>Redis集群是Redis的一个分布式实现，主要是为了实现以下这些目标</p>
+<ul>
+<li>在1000个节点的时候仍能表现得很好并且可扩展性是线性的</li>
+<li>没有合并操作，这样在Redis的数据模型中最典型的大数据值中也能很好的表现</li>
+<li>写入安全：那么与大多数节点相连的客户端所做的写入操作，系统尝试全部都保存下来。不过公认的，还是会有小部分写入会丢失</li>
+<li>可用性：在绝大多数的主节点（master node）是可达的，并且对于每一个不可达的主节点都至少有一个他的从节点（slave）可达的情况下，Redis集群仍能进行分期操作</li>
+</ul>
+<h3 id="1、Redis集群TCP端口"><a href="#1、Redis集群TCP端口" class="headerlink" title="1、Redis集群TCP端口"></a>1、Redis集群TCP端口</h3><p>每个Redis集群中的节点都需要打开两个TCP连接。一个连接用于正常的给Client提供服务，比如6379，还有一个额外的端口(通过在这个端口号上加10000)作为数据端口，比如16379.第二个端口用于集群总线，这是一个用二进制协议的点对点通信信道。这个集群总线（cluster bus）用于节点的失败侦测、配置更新、故障转移授权，等等。客户端从来都不应该尝试和这些集群总线端口通信，它们只应该和正常的Redis命令端口进行通信。注意确保命令端口和集群总线端口的偏移量总是10000.</p>
+<p>注意，如果想要集群按照你想的那样工作，那么集群中的每个节点应该：</p>
+<ol>
+<li>正常的客户端通信端口（通常是6379）用于和所有可到达集群的所有客户端通信</li>
+<li>集群总线端口（client port+10000）必须对所有的其他节点是可到达的</li>
+</ol>
+<h3 id="2、Redis集群数据分片（Redis-Cluster-data-sharding）"><a href="#2、Redis集群数据分片（Redis-Cluster-data-sharding）" class="headerlink" title="2、Redis集群数据分片（Redis Cluster data sharding）"></a>2、Redis集群数据分片（Redis Cluster data sharding）</h3><p>Redis集群不同一致性哈希，它是一种不同的分片形式，在这种形式中，每个key都是一个概念性（hash slot）的一部分</p>
+<p>Redis集群中有16384个hash slots，为了计算给定的key应该在哪个hash slot上，我们简单地用这个key的CRC16值来对16384取模、（即：key的CRC16%16384）</p>
+<p>Redis集群中的每个节点负责一部分hash slots，假设你的集群有三个节点，那么：</p>
+<ul>
+<li>Node A contains hash slots from 0 to 5500</li>
+<li>Node B contains hash slots from 5501 to 11000</li>
+<li>Node C contains hash slots from 11001 to 16383</li>
+</ul>
+<p>允许添加和删除集群节点。比如你想增加一个新的节点D，那么就需要从A、B、C节点上删除一些hash slot 给到D。同样地，如果你想从集群中删除节点A，那么会将A上面的hash slots移动到B和C，当节点A上是空的时候就可以将其从集群中完全删除。</p>
+<p>因为将hash slots从一个节点移动到另一个节点并不需要停止其他的操作，添加、删除、节点以及更改节点所维护的hash slots的百分比都不需要任何停机时间。<br>也就是说，移动hash slots是并行的，移动hash slots不会影响其他操作</p>
+<p>Redis 支持多个key操作，只要这些key在一个单个命令中执行（或者一个事务，或者lua脚本执行），那么它们就属于相同的hash slot。你也可以用hash tags强制多个key都在相同的hash slot中</p>
+<h3 id="3、Redis集群主从模式（Redis-Cluster-master-slave-model）"><a href="#3、Redis集群主从模式（Redis-Cluster-master-slave-model）" class="headerlink" title="3、Redis集群主从模式（Redis Cluster master-slave model）"></a>3、Redis集群主从模式（Redis Cluster master-slave model）</h3><p>当部分master节点失败了，或者不能够和大多数节点通信的时候，为了保持可用，Redis集群用一个master-slave模式，这样的话每个hash slot就有1到N个副本。</p>
+<p>在我们的例子中，集群有A、B、C三个节点，如果节点B失败了，那么5501-11000之间的hash slot将无法提供服务。然而，当我们给每个master节点添加一个slave节点以后，我们的集群最终会变成由A、B、C三个master节点和A1、B1、C1三个slave节点组成，这个时候如果B失败了。系统仍然可用。节点B1是B的副本，如果B失败了，集群会将B1提升为新的master，从而继续提供服务。然而，如果B和B1同时失败了，那么整个集群将不可用。</p>
+<h3 id="4、Redis集群一致性保证（Redis-Cluster-consistency-guarantees）"><a href="#4、Redis集群一致性保证（Redis-Cluster-consistency-guarantees）" class="headerlink" title="4、Redis集群一致性保证（Redis Cluster consistency guarantees）"></a>4、Redis集群一致性保证（Redis Cluster consistency guarantees）</h3><p>Redis集群不能保证强一致性。换句话说，Redis集群可能会丢失一些写操作。第一个原因就是异步复制副本机制</p>
+<p>写可能是这样发生的：</p>
+<ul>
+<li>客户端写到masterB</li>
+<li>master B回复客户端OK</li>
+<li>master B将这个写操作广播给它的slave B1、B2、B3</li>
+</ul>
+<p>正如看到的那样，B没有等到B1、B2、B3确认就回复客户端了。也就是说，B在回复客户端之前没有等待B1、B2、B3的确认，这对应Redis来说是一个潜在的风险。所以。如果客户端写了一些东西。B也确认了这个写操作，但是在它将这个写操作发给它的slaves之前它宕机了，随后其中一个slave（没有收到这个写命令）可能被提升为新的master，于是这个写操作就永远丢失了</p>
+<p>和大多数配置为每秒刷新一次数据到磁盘的情况是一样的。你可以通过强制数据库在回复客户端以前刷新数据，但是这样的结构会导致性能很低。相当于同步复制。</p>
+<p>基本上需要在性能和一致性之间做一个权衡</p>
+<p>如果绝对需要的话，Redis集群也是支持同步写的，这是通过WAIT命令实现的，这使得丢失写的可能性大大降低。然而，需要注意的是，Redis集群没有实现强一致性，即使用同步复制，因为总是有更复杂的失败场景使得一个没有接受到这个写操作的slave当选为新master。</p>
+<p>另一个值得注意的场景，即Redis集群将会丢失写操作，这发生在一个网络分区中，在这个分区中，客户端与少数实例（包括至少一个主机）隔离。</p>
+<p>假设这样一个例子，有一个集群有6个节点，分别由A、B、C、A1、B1、C1组成，三个masters三个slaves，有一个客户端我们叫Z1。在分区发生以后，可能分区一边是A、C、A1、B1、C1，另一个有B和Z1。此时，Z1仍然可用写数据到B，如果网络分区的时间很短，那么集群可能继续工作，而如果分区的时间足够长以至于B1在多得那一边被提升为master，那么这个时候Z1写到B上的数据机会丢失</p>
+<p>什么意思呢？简单的来说就是，本来三主三从在一个网络分区中，突然网络分区发生，于是一边是A、C、A1、B1、C1，另一边是B和Z1，这时候Z1往B中写数据，于此同时另一边（即A、C、A1、B1、C1）认为B已经挂了，于是将B1提升为master，当分区回复的时候，由于B1变成了master，所以B就成了slave，于是B就要丢弃它自己原有的数据而从B1那里同步数据，于是乎先去Z1写到B的数据就丢失了。</p>
+<p>注意，有一个最大窗口，这是Z1能够向B写的最大数量：如果时间足够的话，分区的多数的那一边已经选举完成，选择一个slave成为master，此时，所有在少数的那一边的master节点将停止接受写。</p>
+<p>也就说说，有一个最大窗口的设置项，它决定了Z1在那种情况下能够向B发送多数写操作：如果分隔的时间足够长，多数的那边已经选举slave成为新的master，此后少数那边的所有master节点将不再接受写操作。</p>
+<p>在Redis集群中，这个时间数量是一个非常重要的配置指令，它被称为node timeout。在超过node timeout以后，一个master节点被认为已经失败了，并且选择它的一个副本接替master。类似地，如果在过了node timeout时间以后，没有一个master能够和其它大多数的master通信，那么整个集群都将停止接受写操作。</p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/架构/" rel="tag"># 架构</a>
+          
+            <a href="/tags/redis/" rel="tag"># redis</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/03/20/分布式一致性协议/" rel="next" title="分布式一致性协议">
+                <i class="fa fa-chevron-left"></i> 分布式一致性协议
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/03/20/面试-分布式之消息队列要点复习/" rel="prev" title="分布式之消息队列要点复习">
+                分布式之消息队列要点复习 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zengyuanye</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis集群"><span class="nav-number">1.</span> <span class="nav-text">Redis集群</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Redis集群的目标"><span class="nav-number">2.</span> <span class="nav-text">Redis集群的目标</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1、Redis集群TCP端口"><span class="nav-number">3.</span> <span class="nav-text">1、Redis集群TCP端口</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2、Redis集群数据分片（Redis-Cluster-data-sharding）"><span class="nav-number">4.</span> <span class="nav-text">2、Redis集群数据分片（Redis Cluster data sharding）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3、Redis集群主从模式（Redis-Cluster-master-slave-model）"><span class="nav-number">5.</span> <span class="nav-text">3、Redis集群主从模式（Redis Cluster master-slave model）</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#4、Redis集群一致性保证（Redis-Cluster-consistency-guarantees）"><span class="nav-number">6.</span> <span class="nav-text">4、Redis集群一致性保证（Redis Cluster consistency guarantees）</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zengyuanye</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
