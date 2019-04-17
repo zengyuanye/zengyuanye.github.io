@@ -5,7 +5,7 @@
   
 
 
-<html class="theme-next muse use-motion" lang="zh-Hans">
+<html class="theme-next mist use-motion" lang="zh-Hans">
 <head><meta name="generator" content="Hexo 3.8.0">
   <meta charset="UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -86,7 +86,7 @@
 <meta property="og:site_name" content="zengyuanye">
 <meta property="og:description" content="跨域资源请求处理两种请求 浏览器将CORS请求分成两类：简单请求（ simple request）和非简单请求（ not-so-simple request）。">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-03-28T10:13:08.755Z">
+<meta property="og:updated_time" content="2019-04-17T07:39:45.140Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="跨域资源共享 CORS">
 <meta name="twitter:description" content="跨域资源请求处理两种请求 浏览器将CORS请求分成两类：简单请求（ simple request）和非简单请求（ not-so-simple request）。">
@@ -97,7 +97,7 @@
   var NexT = window.NexT || {};
   var CONFIG = {
     root: '/',
-    scheme: 'Muse',
+    scheme: 'Mist',
     version: '5.1.4',
     sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
     fancybox: true,
@@ -298,7 +298,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  548
+                  591
                 </span>
               
 
@@ -350,8 +350,11 @@
 </ol>
 <p>该字段可选,它的值是一个布尔值，表示是否允许发送Cookie。默认情况下，Cookie不包括在CORS请求之中。设为true，即表示服务器明确许可，Cookie可以包含在请求中，一起发给服务器。这个值也只能设为true，如果服务器不要浏览器发送Cookie，删除该字段即可。</p>
 <ol start="3">
-<li>Access-Control-Expose-Headers<br>该字段可选,CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader(‘FooBar’)可以返回FooBar字段的值。</li>
+<li>Access-Control-Expose-Headers<br>该字段可选,CORS请求时，XMLHttpRequest对象的getResponseHeader()方法只能拿到6个基本字段：Cache-Control、Content-Language、Content-Type、Expires、Last-Modified、Pragma。如果想拿到其他字段，就必须在Access-Control-Expose-Headers里面指定。上面的例子指定，getResponseHeader(‘FooBar’)可以返回FooBar字段的值。<h4 id="Option请求"><a href="#Option请求" class="headerlink" title="Option请求"></a>Option请求</h4></li>
 </ol>
+<p>非简单请求浏览器都会发出option请求：</p>
+<p>1、获取服务器支持的HTTP请求方法；</p>
+<p>2、用来检查服务器的性能</p>
 <h3 id="非简单请求"><a href="#非简单请求" class="headerlink" title="非简单请求"></a>非简单请求</h3><ol>
 <li>Access-Control-Allow-Origin</li>
 </ol>
@@ -479,7 +482,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">22</span>
+                  <span class="site-state-item-count">24</span>
                   <span class="site-state-item-name">日志</span>
                 </a>
               </div>
@@ -490,7 +493,7 @@
               
               <div class="site-state-item site-state-categories">
                 <a href="/categories/index.html">
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">5</span>
                   <span class="site-state-item-name">分类</span>
                 </a>
               </div>
@@ -534,7 +537,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#跨域资源请求处理"><span class="nav-number">1.</span> <span class="nav-text">跨域资源请求处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#只要同时满足以下两大条件，就属于简单请求。"><span class="nav-number">2.</span> <span class="nav-text">只要同时满足以下两大条件，就属于简单请求。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单请求"><span class="nav-number">3.</span> <span class="nav-text">简单请求</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非简单请求"><span class="nav-number">4.</span> <span class="nav-text">非简单请求</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#跨域资源请求处理"><span class="nav-number">1.</span> <span class="nav-text">跨域资源请求处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#只要同时满足以下两大条件，就属于简单请求。"><span class="nav-number">2.</span> <span class="nav-text">只要同时满足以下两大条件，就属于简单请求。</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#简单请求"><span class="nav-number">3.</span> <span class="nav-text">简单请求</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Option请求"><span class="nav-number">3.1.</span> <span class="nav-text">Option请求</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#非简单请求"><span class="nav-number">4.</span> <span class="nav-text">非简单请求</span></a></li></ol></div>
             
 
           </div>
@@ -572,7 +575,7 @@
 
 
 
-  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Muse</a> v5.1.4</div>
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
 
 
 
