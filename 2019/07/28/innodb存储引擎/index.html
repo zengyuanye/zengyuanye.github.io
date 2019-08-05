@@ -1,0 +1,829 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform">
+<meta http-equiv="Cache-Control" content="no-siteapp">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css">
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css">
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT">
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="innoDB存储引擎 InnoDB存储引擎具有行锁设计、支持mvcc、支持外键、提供一致性非锁定读，同时被设计用来最有效地利用以及使用内存和CPU的支持ACID事务的Mysql存储引擎。  🤩行锁设计是为了减少影响其他的行，mvcc设计主要提供快照读，避免写入时占用导致不能读">
+<meta property="og:type" content="article">
+<meta property="og:title" content="innoDB存储引擎">
+<meta property="og:url" content="http://yoursite.com/2019/07/28/innodb存储引擎/index.html">
+<meta property="og:site_name" content="zengyuanye">
+<meta property="og:description" content="innoDB存储引擎 InnoDB存储引擎具有行锁设计、支持mvcc、支持外键、提供一致性非锁定读，同时被设计用来最有效地利用以及使用内存和CPU的支持ACID事务的Mysql存储引擎。  🤩行锁设计是为了减少影响其他的行，mvcc设计主要提供快照读，避免写入时占用导致不能读">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="http://yoursite.com/images/innodb-cache-structure.jpg">
+<meta property="og:updated_time" content="2019-08-05T12:45:03.026Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="innoDB存储引擎">
+<meta name="twitter:description" content="innoDB存储引擎 InnoDB存储引擎具有行锁设计、支持mvcc、支持外键、提供一致性非锁定读，同时被设计用来最有效地利用以及使用内存和CPU的支持ACID事务的Mysql存储引擎。  🤩行锁设计是为了减少影响其他的行，mvcc设计主要提供快照读，避免写入时占用导致不能读">
+<meta name="twitter:image" content="http://yoursite.com/images/innodb-cache-structure.jpg">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: '博主'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2019/07/28/innodb存储引擎/">
+
+
+
+
+
+  <title>innoDB存储引擎 | zengyuanye</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">zengyuanye</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br>
+            
+            首页
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br>
+            
+            归档
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/07/28/innodb存储引擎/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="zengyuanye">
+      <meta itemprop="description" content>
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="zengyuanye">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">innoDB存储引擎</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-07-28T16:46:32+08:00">
+                2019-07-28
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+            <span class="post-meta-divider">|</span>
+            <span class="page-pv"><i class="fa fa-file-o"></i>  阅读数
+            <span class="busuanzi-value" id="busuanzi_value_page_pv"></span>
+            </span>
+          
+
+          
+            <div class="post-wordcount">
+              
+                
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-file-word-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">字数统计&#58;</span>
+                
+                <span title="字数统计">
+                  2.6k
+                </span>
+              
+
+              
+                <span class="post-meta-divider">|</span>
+              
+
+              
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-clock-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">阅读时长 &asymp;</span>
+                
+                <span title="阅读时长">
+                  9
+                </span>
+              
+            </div>
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h3 id="innoDB存储引擎"><a href="#innoDB存储引擎" class="headerlink" title="innoDB存储引擎"></a>innoDB存储引擎</h3><p> InnoDB存储引擎具有行锁设计、支持mvcc、支持外键、提供一致性非锁定读，同时被设计用来最有效地利用以及使用内存和CPU的支持ACID事务的Mysql存储引擎。</p>
+<p> 🤩行锁设计是为了减少影响其他的行，mvcc设计主要提供快照读，避免写入时占用导致不能读<br><a id="more"></a></p>
+<h3 id="体系架构"><a href="#体系架构" class="headerlink" title="体系架构"></a>体系架构</h3><pre><code>  后台线程（刷新内存池中的数据，将已修改的数据文件刷新到磁盘文件）
+     |
+     |
+innoDB存储引擎内存池(CPU速度与磁盘速度之间的鸿沟过大，解决性能的手段)
+     |    
+     |
+    文件
+</code></pre><h3 id="后台线程"><a href="#后台线程" class="headerlink" title="后台线程"></a>后台线程</h3><ol>
+<li><p>master Thread </p>
+<p> 将缓冲池中的数据异步刷新到磁盘，保证数据的一致性，包括脏页的刷新、合并插入缓冲、UNDO页的回收</p>
+</li>
+<li><p>IO Thread</p>
+<p> 负责处理AIO请求的回调处理，write、read、insert buffer、log Io thread</p>
+</li>
+<li><p>Purge Thread </p>
+<p> 事务被提交后，其所使用的undolog可能不再需要，因此需要PurgeThread来回收已经使用并分配的undo页</p>
+</li>
+<li><p>Page Cleaner Thread</p>
+<p> 将之前版本中(小于1.2.x)脏页的刷新操作都放入到单独的线程中来完成。目的是为了减轻原Master Thread的工作及对于用户查询线程的阻塞，进一步提供Innodb存储引擎的性能 </p>
+</li>
+</ol>
+<h3 id="内存"><a href="#内存" class="headerlink" title="内存"></a>内存</h3><p>数据在内存读取流程:在数据库中进行读取页的操作，首先将从磁盘读到的页存放在缓冲池中，这个过程称为将页“FIX”在缓存池中。下一次再读相同的页时，首先判断该页是否在缓存池中。若在缓冲池中，称该页在缓冲池被命中直接读取该页。否则读取磁盘上的页 </p>
+<p>对于数据库中页的修改操作，则首先修改在缓冲池中的页，然后再以一定的频率刷新到磁盘上。这里需要注意的是，页从缓冲池刷新回磁盘的操作并不是在每次页发生更新时触发，而是通过一种称为Checkpoint的机制刷新回磁盘、同样这也是为了提高数据库的整体性能</p>
+<p>🤩由于硬件执行速度的差异，可使用内存解决大部分性能损失，所以导致了架构出现的后台线程，内存中数据的操作。磁盘读取文件是以页为单位，一次读取一页大概16KB。缓存池的大小直接影响数据库的性能，</p>
+<p>以上是缓存池的基本结构</p>
+<p><img src="/images/innodb-cache-structure.jpg" alt="structure"></p>
+<p>从Innodb1.0.x版本开始，允许有多个缓冲池实例。每个页根据哈希值平均分配到不同缓冲池实例中。减少内部资源竞争，增加数据库的并发处理能力。可通过参数Innodb_buffer_pool_instances来进行配置，该值默认为1.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">	show variables like &apos;innodb_buffer_pool_instances&apos;</span><br><span class="line">```	</span><br><span class="line">1. LRU LIST、Free List和Flush List</span><br><span class="line"></span><br><span class="line"> LRU（lastest Recent Used 最近最少使用）算法。最频繁使用的页在lru列表的前端，而最少使用的页在lru列表的尾端。当缓冲池不能存放新读取到的页时，将首先释放Lru列表中尾端的页。在Innodb存储引擎中，缓冲池中的页的大小默认为16KB,同样使用lru算法对缓冲池进行管理。</span><br><span class="line"> </span><br><span class="line"> 🤩lru算法一般使用双向链表、hashmap实现。hashmap便于快速定位查找的位置。双向链表便于控制链接的长度</span><br><span class="line"> </span><br><span class="line"> 在innodb存储引擎中。lru列表中还加入了Midpoint位置。新读取到的页，虽然是最新访问的页，但并不是直接放入在lru列表的首部，而是放入到Lru列表的Midpoint位置。默认是在lru列表长度的5/8处。可由参数Innodb\_old\_blocks\_pct控制</span><br><span class="line"> </span><br><span class="line"> ```mysql</span><br><span class="line"> 	show variables like &apos;innodb_old_blocks_pct&apos;</span><br></pre></td></tr></table></figure>
+<p> 为什么不采用朴素的lru算法，直接将读取的页放入到Lru列表的首部呢？</p>
+<p> 这是因为若直接将读取到的页当如到Lru的首部，那么某些sql操作可能会使缓冲池中的页被刷新出，从而影响缓冲池的效率。常见的这类操作作为索引或数据的扫描操作。这类操作需要访问表中的许多页，甚至是全部的页，而这些页通常来说又仅在这次查询操作中需要，并不是活跃的热点数据。如果页被放入Lru列表的首部，那么非常可能将所需要的热点数据页从lru列表中移除，而在下一次需要读取该页时，innodb存储引擎需要再次访问磁盘<br> 为了解决这个问题，Innodb引入了另一个参数来管理lru列表，innodb_old_blocks_time,用于表示页读取到Mid位置后需要等待多久才会被加入到Lru列表的热端。</p>
+<p>  页面压缩。即将原本16kb的页压缩为1kb、2kb、4kb和8kb。而由于页的大小发生了变化，Lru列表也有了些许的改变。对于非16kb的页，是通过unzip_lru列表进行管理的。通过命令show engine innodb status可以观察到</p>
+<p>  unzip_LRU是怎样从缓存池中分配内存的呢？例如需要从缓冲池申请页为4Kb的大小。其过程如下：</p>
+<ol>
+<li>检查4kb的unzip_LRU列表，检查是否有可用的空闲页</li>
+<li>若有，则直接使用</li>
+<li>否则，检查8kb的unzio_LRU列表</li>
+<li>若能够得到空闲页，将页分成2个4kb的页，存放到4kb的unzip_lru列表；</li>
+<li><p>若不能得到空闲页，从Lru列表中申请一个16kb的页，将页分为1个8kb的页、2个4kb的页，分别存放到对应的unzip_LRU列表中。</p>
+<p>即以4的倍数申请再以2分之1进行拆分。</p>
+<p>在lru列表中的页被修改后，称该页为脏页，即缓冲池中的页和磁盘的页的数据产生了不一致。数据库会通过checkpoiont机制将脏页刷新回磁盘、而flush列表中的页即为脏页列表。lru列表和flush列表都是存储页的指针。lru列表用于使用。flush列表用来管理将页刷新回磁盘。</p>
+</li>
+</ol>
+<ol start="2">
+<li><p>重做日志缓存</p>
+<p> 事务开始之后就产生redo log，redo log的落盘并不是随着事务的提交才写入的，而是在事务的执行过程中，便开始写入redo log文件中。</p>
+<p> 重做日志缓存每秒会刷新到日志文件。因此用户需要保证每秒产生的事务量在这个缓冲大小之内即可。有配置参数innodb_log_buffer_size控制默认为8mb</p>
+<p> 重做日志缓冲三种刷盘时机:</p>
+<ol>
+<li>master thread每一秒将重做日志缓冲刷新到重做日志；</li>
+<li>每个事物提交时会将重做日志缓冲刷新到重做日志文件；</li>
+<li>当重做日志缓冲池剩余空间小于1/2时，重做日志缓冲刷新到重做日志文件。</li>
+</ol>
+</li>
+<li><p>额外的内存池</p>
+<p> 当缓存池内存不够时，用于数据结构本身的内存进行分配会从额外内存池申请。因此申请很大的innodb缓冲池时。需要考虑增加这个值</p>
+</li>
+</ol>
+<h3 id="checkpoint技术"><a href="#checkpoint技术" class="headerlink" title="checkpoint技术"></a>checkpoint技术</h3><p>checkpoint通过lsn(log sequence number)标记已刷新到磁盘的脏页。分为两种:sharp checkpoint、fuzzy checkpoint</p>
+<p>在未使用checkoutpoint之前。如果实时刷新缓冲池的数据到磁盘，开销会非常大。而且刷新到磁盘的时刻如果发送宕机，那么数据就不能恢复了。为了避免发送数据丢失的问题。当前事务数据库系统普遍都采用了write ahead log策略。即当事务提交时。先写重做日志。再修改页。当由于发送宕机而导致数据丢失时，通过重做日志来完成数据的恢复。这也是事务ACID中D持久性的要求。</p>
+<p>checkpoint技术用于解决三个问题:</p>
+<ol>
+<li>缩短数据库的恢复时间</li>
+<li>缓冲池不够用时，将脏页刷新到磁盘</li>
+<li>重做日志不可用时，刷新脏页。</li>
+</ol>
+<p>sharp checkpoint 发生在数据库关闭时将所有的脏页都刷新回磁盘。参数innodb_fast_shutdown = 1</p>
+<p>故innodb存储引擎内部使用fuzzy checkpoint进行页刷新，即只刷新一部分脏页，而不是刷新所有的脏页回磁盘</p>
+<p>发生刷新fuzzy checkpoint的情况:</p>
+<ol>
+<li><p>master thread checkpoint</p>
+<p> 每秒/10秒异步刷新一定比例的页回磁盘</p>
+</li>
+<li><p>FLUSH_LRU_LIST checkpoint</p>
+<p> innodb存储引擎需要保证LRU列表中需要有差不多100个空闲页可供使用.倘若不足100，那么Innodb存储引擎会将LRU列表尾端的页移除。如果有脏页数据，那么需要进行checkpoint.而这些页是来自LRU列表，因此称为FLUSH_LRU_LIST checkpoint</p>
+</li>
+<li><p>Async/sync flush checkpoint</p>
+<p> 指的是重做日志文件不可用的情况，这时需要强制将一些页刷新回磁盘，而此时脏页是从脏页列表中国选取的，若将已经写入到重做日志的lsn记为redo_lsn,将已经刷新回磁盘最新页的lsn记为checkpoint_lsn则可定义:</p>
+<p> checkpoint_age  = redo_lsn - checkpoint_lsn</p>
+<p> 再定义以下的变量:</p>
+<p> async_water_mark = 75% * total_redo_log_file_size</p>
+<p> sync_water_mark = 90% * total_redo_log_file_size</p>
+<p> 若每个重做日志文件的大小为1GB，并且定义了两个重做日志文件，则重做日志文件的总大小为2GB。那么async_water_mark  = 1.5Gb,sync_water_mark = 1.8GB/则有</p>
+<ol>
+<li>当checkpoint_age&lt;async_water_mark时，不需要刷新任何脏页到磁盘</li>
+<li>当async_water_mark&lt;checkpoint_age&lt;sync_water_mark时触发Async flush,从flush列表中刷新足够的脏页回磁盘，使得刷新后满足checkpoint_age&lt;async_water_\mark</li>
+<li>checkpoint_age&gt;sync_water_mark这种情况一般很少发生，除非设置的重做日志文件大小。此时触发sync flush操作。从flush列表中刷新足够的脏页回磁盘。使得刷新后满足checkpoint_age&lt;aync_water_mark</li>
+</ol>
+</li>
+<li><p>dirty page too much checkpoint</p>
+<p> 即脏页数量太多。导致Innodb存储引擎强制进行checkpoint.目的为了保证缓冲池中有足够的可用页。由参数innodb_max_dirty_pages_pct控制：一般设置75表示当缓冲池中国脏页的数量占据75%时，强制进行checkpoint刷新一部分的脏页到磁盘。</p>
+</li>
+</ol>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/05/20/集群的组成/" rel="next" title>
+                <i class="fa fa-chevron-left"></i> 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/08/05/laravel中间件/" rel="prev" title="laravel中间件原理">
+                laravel中间件原理 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">zengyuanye</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">29</span>
+                  <span class="site-state-item-name">日志</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-categories">
+                <a href="/categories/index.html">
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">分类</span>
+                </a>
+              </div>
+            
+
+            
+              
+              
+              <div class="site-state-item site-state-tags">
+                <a href="/tags/index.html">
+                  <span class="site-state-item-count">9</span>
+                  <span class="site-state-item-name">标签</span>
+                </a>
+              </div>
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#innoDB存储引擎"><span class="nav-number">1.</span> <span class="nav-text">innoDB存储引擎</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#体系架构"><span class="nav-number">2.</span> <span class="nav-text">体系架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#后台线程"><span class="nav-number">3.</span> <span class="nav-text">后台线程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#内存"><span class="nav-number">4.</span> <span class="nav-text">内存</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#checkpoint技术"><span class="nav-number">5.</span> <span class="nav-text">checkpoint技术</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2019</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">zengyuanye</span>
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a> 强力驱动</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+
+        
+<div class="busuanzi-count">
+    <script async src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+
+  
+    <span class="site-uv">
+      访客数
+      <span class="busuanzi-value" id="busuanzi_value_site_uv"></span>
+      人
+    </span>
+  
+
+  
+    <span class="site-pv">
+      总访问量
+      <span class="busuanzi-value" id="busuanzi_value_site_pv"></span>
+      次
+    </span>
+  
+</div>
+
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
