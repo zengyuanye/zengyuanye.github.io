@@ -68,7 +68,7 @@
 
 
 
-  <meta name="keywords" content="Hexo, NexT">
+  <meta name="keywords" content="架构,中间件,">
 
 
 
@@ -79,17 +79,18 @@
 
 
 
-<meta name="description" content="rabbitMq 集群文档 节点名的认证   集群要求 集群节点之间哪些数据需要/不需要复制 集群对客户端意味着什么 集群如何运行 节点是如何相互认证的 节点重启，节点如何加入集群 如何移除集群节点 如何重置集群节点 RabbitMQ代理是一个或多个Erlang节点的逻辑分组，每个节点运行RabbitMQ应用程序并共享用户，虚拟主机，队列，交换，绑定和运行时参数">
+<meta name="description" content="集群的组成与对等发现本篇不包含哪些端口必须打开的内容,节点互相认证等内容。仅仅针对同节点发现的子系统。包括节点的发现机制,配置,重新加入. 什么是节点发现组成一个集群，新(空白)节点需要发现它的同伴并认证。有很多插件节点发现机制可以完成。比如监听配置文件中配置的节点.其他则是动态发现 可行的发现机制">
+<meta name="keywords" content="架构,中间件">
 <meta property="og:type" content="article">
-<meta property="og:title" content="zengyuanye">
-<meta property="og:url" content="http://yoursite.com/2019/05/18/rabbitMq 集群文档/index.html">
+<meta property="og:title" content="rabbitMQ集群的组成">
+<meta property="og:url" content="http://yoursite.com/2001/03/05/集群的组成/index.html">
 <meta property="og:site_name" content="zengyuanye">
-<meta property="og:description" content="rabbitMq 集群文档 节点名的认证   集群要求 集群节点之间哪些数据需要/不需要复制 集群对客户端意味着什么 集群如何运行 节点是如何相互认证的 节点重启，节点如何加入集群 如何移除集群节点 如何重置集群节点 RabbitMQ代理是一个或多个Erlang节点的逻辑分组，每个节点运行RabbitMQ应用程序并共享用户，虚拟主机，队列，交换，绑定和运行时参数">
+<meta property="og:description" content="集群的组成与对等发现本篇不包含哪些端口必须打开的内容,节点互相认证等内容。仅仅针对同节点发现的子系统。包括节点的发现机制,配置,重新加入. 什么是节点发现组成一个集群，新(空白)节点需要发现它的同伴并认证。有很多插件节点发现机制可以完成。比如监听配置文件中配置的节点.其他则是动态发现 可行的发现机制">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2019-05-18T06:10:03.437Z">
+<meta property="og:updated_time" content="2019-08-06T01:06:45.820Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="zengyuanye">
-<meta name="twitter:description" content="rabbitMq 集群文档 节点名的认证   集群要求 集群节点之间哪些数据需要/不需要复制 集群对客户端意味着什么 集群如何运行 节点是如何相互认证的 节点重启，节点如何加入集群 如何移除集群节点 如何重置集群节点 RabbitMQ代理是一个或多个Erlang节点的逻辑分组，每个节点运行RabbitMQ应用程序并共享用户，虚拟主机，队列，交换，绑定和运行时参数">
+<meta name="twitter:title" content="rabbitMQ集群的组成">
+<meta name="twitter:description" content="集群的组成与对等发现本篇不包含哪些端口必须打开的内容,节点互相认证等内容。仅仅针对同节点发现的子系统。包括节点的发现机制,配置,重新加入. 什么是节点发现组成一个集群，新(空白)节点需要发现它的同伴并认证。有很多插件节点发现机制可以完成。比如监听配置文件中配置的节点.其他则是动态发现 可行的发现机制">
 
 
 
@@ -119,13 +120,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2019/05/18/rabbitMq 集群文档/">
+  <link rel="canonical" href="http://yoursite.com/2001/03/05/集群的组成/">
 
 
 
 
 
-  <title> | zengyuanye</title>
+  <title>rabbitMQ集群的组成 | zengyuanye</title>
   
 
 
@@ -232,7 +233,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2019/05/18/rabbitMq 集群文档/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2001/03/05/集群的组成/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="zengyuanye">
@@ -249,7 +250,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline"></h1>
+          <h1 class="post-title" itemprop="name headline">rabbitMQ集群的组成</h1>
         
 
         <div class="post-meta">
@@ -261,8 +262,8 @@
               
                 <span class="post-meta-item-text">发表于</span>
               
-              <time title="创建于" itemprop="dateCreated datePublished" datetime="2019-05-18T09:52:45+08:00">
-                2019-05-18
+              <time title="创建于" itemprop="dateCreated datePublished" datetime="2001-03-05T22:20:00+08:00">
+                2001-03-05
               </time>
             
 
@@ -271,6 +272,28 @@
             
           </span>
 
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing">
+                  <a href="/categories/架构/" itemprop="url" rel="index">
+                    <span itemprop="name">架构</span>
+                  </a>
+                </span>
+
+                
+                
+              
+            </span>
           
 
           
@@ -298,7 +321,7 @@
                   <span class="post-meta-item-text">字数统计&#58;</span>
                 
                 <span title="字数统计">
-                  135
+                  1.2k
                 </span>
               
 
@@ -314,7 +337,7 @@
                   <span class="post-meta-item-text">阅读时长 &asymp;</span>
                 
                 <span title="阅读时长">
-                  1
+                  4
                 </span>
               
             </div>
@@ -335,20 +358,42 @@
       
 
       
-        <h3 id="rabbitMq-集群文档"><a href="#rabbitMq-集群文档" class="headerlink" title="rabbitMq 集群文档"></a>rabbitMq 集群文档</h3><ul>
-<li>节点名的认证</li>
+        <h3 id="集群的组成与对等发现"><a href="#集群的组成与对等发现" class="headerlink" title="集群的组成与对等发现"></a>集群的组成与对等发现</h3><p>本篇不包含哪些端口必须打开的内容,节点互相认证等内容。仅仅针对同节点发现的子系统。包括节点的发现机制,配置,重新加入.</p>
+<h3 id="什么是节点发现"><a href="#什么是节点发现" class="headerlink" title="什么是节点发现"></a>什么是节点发现</h3><p>组成一个集群，新(空白)节点需要发现它的同伴并认证。有很多插件节点发现机制可以完成。比如监听配置文件中配置的节点.其他则是动态发现</p>
+<p>可行的发现机制<br><a id="more"></a></p>
+<ul>
+<li>config</li>
+<li>预配置的DNS A/AAAA记录</li>
 </ul>
-<ol start="2">
-<li>集群要求</li>
-<li>集群节点之间哪些数据需要/不需要复制</li>
-<li>集群对客户端意味着什么</li>
-<li>集群如何运行</li>
-<li>节点是如何相互认证的</li>
-<li>节点重启，节点如何加入集群</li>
-<li>如何移除集群节点</li>
-<li>如何重置集群节点</li>
-<li>RabbitMQ代理是一个或多个Erlang节点的逻辑分组，每个节点运行RabbitMQ应用程序并共享用户，虚拟主机，队列，交换，绑定和运行时参数</li>
+<p>插件自3.7.0开始，以下对等发现插件随RabbitMQ一起提供：</p>
+<ul>
+<li>AWS(EC2)</li>
+<li>Kubernetes</li>
+<li>Consul</li>
+<li>etcd</li>
+</ul>
+<h4 id="指定对等发现机制"><a href="#指定对等发现机制" class="headerlink" title="指定对等发现机制"></a>指定对等发现机制</h4><figure class="highlight shell"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">cluster_formation.peer_discovery_backend = rabbit_peer_discovery_classic_config</span><br></pre></td></tr></table></figure>
+<h3 id="节点相互发现如何运作"><a href="#节点相互发现如何运作" class="headerlink" title="节点相互发现如何运作"></a>节点相互发现如何运作</h3><p>当节点启动并检测到它没有先前初始化的数据库时，它将检查是否配置了对等发现机制。如果是这种情况，它将执行发现并尝试按顺序联系每个发现的对等方。最后，它将尝试加入第一个可达对等体的集群。</p>
+<p>根据不同的发现机制，对等发现的过程可能涉及外部服务.例如AWS API端点,Consul节点或执行DNS查询，一些后端需要节点注册(告诉后端节点已经启动并且应该被视为集群成员).节点列表通过配置文件进行注册。</p>
+<p>当首次形成集群并且还没有已注册的节点时，会发生节点之间的自然竞争条件。不同的后端以不同的方式解决这个问题：一些尝试获取外部服务的锁定，另一些则依赖于随机延迟。此问题不适用于需要提前列出所有节点的后端。</p>
+<p>当配置的后端支持注册时，节点在停止时取消注册</p>
+<p>如果未配置对等发现，或者无法访问对等方，则过去不是集群成员的节点将从头开始初始化并作为独立节点继续运行</p>
+<p>如果节点以前时集群成员，它将尝试在一段时间内联系其”上次见过的”对等体。在这种情况下，不会执行对等点发现。这适用于所有的发现机制</p>
+<h3 id="重新加入节点"><a href="#重新加入节点" class="headerlink" title="重新加入节点"></a>重新加入节点</h3><p>加入集群的新节点只是一种可能的情况。另一种常见情况是现有集群成员暂时离开然后重新加入集群。虽然对等发现子系统不会影响本节中描述的行为，但了解节点在重新启动或失败后重新加入其集群时的行为方式非常重要</p>
+<p>现有的集群成员不会执行对等发现。相反，他们会尝试联系他们以前知道的同行.</p>
+<p>如果一个节点以前是一个集群成员，当它启动时，它会尝试联系其”上次见过的”对等体一段时间。如果未能引导对等体(例如,当执行完成集群重新启动或升级时)或无法访问时,节点将多次重试该操作。默认值分别为10次重试和每次尝试30秒，或总共5分钟。在节点可能需要很长时间或不均匀时间的环境中。建议重试次数增加</p>
+<p>如果节点因与集群失去联系而重置，则其行为类似于空白节点。请注意，其他集群成员可能仍然认为它是集群成员，在这种情况下。双方将不同意并且节点将无法加入。还必须使用针对现有集群成员执行rabbitmqctl_forget_cluster_node从集群中擅长此类重置节点。</p>
+<p>如果操作明确从集群中删除了节点，然后重置，则它将能够作为新成员加入集群。在这种情况下，它的行为与空白节点完全相同。</p>
+<p>在节点名称或主机名更改后重新加入的节点可以作为空节点启动，如果其数据目录路径因此而更改。此类节点将无法重新加入集群。但节点脱机时，可以使用空白数据目录重置或启动其对等节点。在这种情况下，恢复节点也将无法重新加入其对等体，因为内部数据存储集群标志将不再匹配。</p>
+<ol>
+<li>形成3个节点A，B和C</li>
+<li>节点A已关闭</li>
+<li>节点B被重置</li>
+<li>节点A已启动</li>
+<li>节点A尝试重新加入B但B的集群标志已更改</li>
+<li>节点B不会将A识别为已知的集群成员，因为它已被重置</li>
 </ol>
+<p>在这种情况下。节点B将拒绝来自A的集群尝试，并在日志中显示相应的错误消息。</p>
 
       
     </div>
@@ -364,6 +409,14 @@
 
     <footer class="post-footer">
       
+        <div class="post-tags">
+          
+            <a href="/tags/架构/" rel="tag"># 架构</a>
+          
+            <a href="/tags/中间件/" rel="tag"># 中间件</a>
+          
+        </div>
+      
 
       
       
@@ -373,18 +426,14 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2019/03/31/explain工具/" rel="next" title="explain工具">
-                <i class="fa fa-chevron-left"></i> explain工具
-              </a>
-            
           </div>
 
           <span class="post-nav-divider"></span>
 
           <div class="post-nav-prev post-nav-item">
             
-              <a href="/2019/05/20/集群的组成/" rel="prev" title>
-                 <i class="fa fa-chevron-right"></i>
+              <a href="/2001/03/05/rabbitMq 集群文档/" rel="prev" title="rabbitMQ集群文档">
+                rabbitMQ集群文档 <i class="fa fa-chevron-right"></i>
               </a>
             
           </div>
@@ -517,7 +566,7 @@
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#rabbitMq-集群文档"><span class="nav-number">1.</span> <span class="nav-text">rabbitMq 集群文档</span></a></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-3"><a class="nav-link" href="#集群的组成与对等发现"><span class="nav-number">1.</span> <span class="nav-text">集群的组成与对等发现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是节点发现"><span class="nav-number">2.</span> <span class="nav-text">什么是节点发现</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#指定对等发现机制"><span class="nav-number">2.1.</span> <span class="nav-text">指定对等发现机制</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#节点相互发现如何运作"><span class="nav-number">3.</span> <span class="nav-text">节点相互发现如何运作</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#重新加入节点"><span class="nav-number">4.</span> <span class="nav-text">重新加入节点</span></a></li></ol></div>
             
 
           </div>
